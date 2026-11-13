@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MediCare Web - Penjejak Kepatuhan Ubat</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17323A;--teal:#0F6B66;--deep:#0A4A47;--mint:#DDF4EA;--paper:#F6FBF8;--sun:#FFC93C;--coral:#F2604F;--line:#CBE3D8;--muted:#5A7580}
+*{box-sizing:border-box;margin:0}
+body{font-family:'Nunito',system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.5}
+h1,h2,.big{font-family:'Baloo 2','Nunito',system-ui,sans-serif}
+button{font:inherit;cursor:pointer;border:0;border-radius:999px;padding:.55rem 1.1rem;font-weight:700;transition:transform .12s}
+button:active{transform:scale(.96)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.btn-main{background:var(--sun);color:var(--ink)}
+.btn-ghost{background:transparent;border:2px solid currentColor;color:inherit}
+header{background:var(--teal);color:#fff;padding:1.6rem 1.2rem 3.4rem}
+.wrap{max-width:1080px;margin:0 auto}
+header h1{font-size:clamp(1.8rem,5vw,2.8rem);font-weight:800;line-height:1.1}
+header p{opacity:.9;margin-top:.3rem}
+.top-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem}
+main{margin-top:-2.2rem;padding:0 1.2rem 3rem}
+.grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:1.2rem}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+section{border-radius:22px;padding:1.3rem}
+.clock{background:var(--deep);color:#fff;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap}
+.time{font-size:clamp(2.6rem,9vw,3.8rem);font-weight:800;line-height:1;letter-spacing:.02em}
+.date{opacity:.85;margin-top:.3rem}
+.next{margin-top:.8rem;background:rgba(255,255,255,.12);border-radius:12px;padding:.5rem .8rem;font-size:.95rem}
+.ringbox{position:relative;width:132px;height:132px;flex:none}
+.ringbox svg{transform:rotate(-90deg)}
+.ringbox .num{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ringbox .num b{font-family:'Baloo 2',sans-serif;font-size:2rem;line-height:1}
+.ringbox .num small{font-size:.7rem;opacity:.85}
+.msg{width:100%;font-weight:700}
+.formp{background:var(--mint)}
+.formp h2,.listp h2,.chartp h2{font-size:1.35rem;margin-bottom:.7rem}
+label{display:block;font-weight:700;font-size:.9rem;margin:.6rem 0 .2rem}
+input{width:100%;padding:.6rem .8rem;border:2px solid var(--line);border-radius:12px;font:inherit;background:#fff;color:var(--ink)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.formp .btn-main{background:var(--teal);color:#fff;margin-top:1rem;width:100%}
+.listp{background:#fff;border:2px solid var(--line)}
+ul{list-style:none;padding:0}
+li.med{display:grid;grid-template-columns:auto 1fr auto;gap:.2rem .9rem;align-items:center;padding:.8rem 0;border-top:1px solid var(--line)}
+li.med:first-child{border-top:0}
+.mt{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:1.5rem;color:var(--teal)}
+.mn{font-weight:700}
+.mi{font-size:.85rem;color:var(--muted)}
+.chip{font-size:.78rem;font-weight:700;padding:.15rem .6rem;border-radius:999px;display:inline-block;margin-top:.15rem}
+.ok{background:#CDEFD9;color:#0B5B33}.wait{background:#FFF0BF;color:#7A5600}.miss{background:#FFD9D3;color:#9A2517}
+.acts{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:flex-end}
+.acts button{font-size:.82rem;padding:.35rem .8rem}
+.take{background:var(--teal);color:#fff}.del{background:#F1F4F3;color:var(--coral)}
+.empty{color:var(--muted);padding:.6rem 0}
+.chartp{background:#FFF3CF;grid-column:1/-1}
+.bars{display:flex;align-items:flex-end;gap:.6rem;height:170px;margin-top:.4rem}
+.bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:.8rem;font-weight:700}
+.bar i{display:block;width:100%;max-width:56px;border-radius:10px 10px 4px 4px;background:var(--teal);min-height:4px;transition:height .5s}
+.bar.none i{background:#E6D9A8;height:4px!important}
+.bar span{margin-top:.3rem;color:var(--muted);font-weight:400}
+#alert{position:fixed;left:50%;bottom:1.2rem;transform:translate(-50%,160%);width:min(94vw,460px);background:var(--coral);color:#fff;border-radius:22px;padding:1.1rem 1.2rem;box-shadow:0 12px 40px rgba(0,0,0,.3);transition:transform .35s;z-index:9}
+#alert.show{transform:translate(-50%,0)}
+#alert h2{font-size:1.4rem}
+#alert .acts{justify-content:flex-start;margin-top:.7rem}
+#alert .take{background:#fff;color:var(--coral)}
+#alert .btn-ghost{color:#fff}
+footer{text-align:center;color:var(--muted);font-size:.85rem;padding-bottom:2rem}
+#report{display:none}
+.cloudp{background:#fff;border:2px solid var(--teal)}
+.cloudp h2{font-size:1.35rem;margin-bottom:.4rem}
+.cloudp .btn-main{background:var(--teal);color:#fff;margin-top:.9rem}
+.cloudp .btn-ghost{color:var(--teal);margin-top:.9rem}
+#cstat{margin-top:.6rem;font-size:.88rem;color:var(--muted)}
+#monBar{display:none;background:var(--sun);color:var(--ink);font-weight:700;padding:.7rem 1.2rem;text-align:center}
+#monAlert{display:none;background:var(--coral);color:#fff;font-weight:700;padding:.7rem 1.2rem;text-align:center}
+body.mon #monBar{display:block}
+body.mon #enable,body.mon #demo,body.mon .formp,body.mon .cloudp,body.mon .acts,body.mon #permInfo{display:none}
+@media print{#monBar,#monAlert{display:none!important}}
+.seg{display:flex;gap:.5rem;flex-wrap:wrap}
+.seg label{margin:0;position:relative}
+.seg input{position:absolute;opacity:0;width:0;height:0}
+.seg span{display:block;padding:.5rem 1rem;border:2px solid var(--line);border-radius:999px;background:#fff;font-weight:700;cursor:pointer}
+.seg input:checked+span{background:var(--teal);border-color:var(--teal);color:#fff}
+.seg input:focus-visible+span{outline:3px solid var(--sun);outline-offset:2px}
+.nav{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap}
+.nav button{background:rgba(255,255,255,.15);color:#fff}
+.nav button.on{background:#fff;color:var(--teal)}
+.chatp{background:#fff;border:2px solid var(--line);grid-column:1/-1}
+.chatp h2{font-size:1.35rem;margin-bottom:.5rem}
+#chatlog{max-height:230px;overflow:auto;display:flex;flex-direction:column;gap:.4rem}
+.msg1{max-width:82%;padding:.45rem .85rem;border-radius:16px;background:var(--mint);word-break:break-word}
+.msg1.me{align-self:flex-end;background:var(--teal);color:#fff}
+.msg1 small{display:block;opacity:.75;font-size:.72rem}
+.chatrow{display:flex;gap:.5rem;margin-top:.6rem}
+.quick{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem}
+.quick button{font-size:.8rem;padding:.3rem .8rem;background:#EAF1EE;color:var(--ink)}
+#chatnote{font-size:.85rem;color:var(--coral);margin-top:.3rem}
+.disc{background:#FFF3CF;border-radius:14px;padding:.7rem 1rem;font-size:.9rem;margin-bottom:1rem}
+.info-head{display:flex;gap:.8rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
+.info-head input{max-width:360px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1rem}
+.mc{border:2px solid var(--line);border-radius:18px;padding:1rem;background:var(--paper)}
+.mc h3{font-family:'Baloo 2',sans-serif;font-size:1.2rem;line-height:1.25;margin:.3rem 0}
+.mc p{font-size:.92rem;margin:.3rem 0}
+.mc ul{list-style:disc;padding-left:1.1rem;font-size:.88rem}
+.mc button{margin-top:.7rem;background:var(--teal);color:#fff;font-size:.85rem}
+.rx{background:#E5DDFB;color:#3F2B8C}.otc{background:#CDEFD9;color:#0B5B33}
+body.mon .mc button{display:none}
+.filters{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem}
+.filters button{font-size:.82rem;padding:.3rem .85rem;background:#EAF1EE;color:var(--ink)}
+.filters button.on{background:var(--teal);color:#fff}
+.farm{background:#FFE9C7;color:#7A4A00}.info{background:#DCEBFF;color:#1E4A8A}
+[hidden]{display:none!important}
+.slots{display:grid;gap:.4rem;margin-top:.6rem}
+.slots label{display:flex;gap:.5rem;align-items:center;margin:0;font-weight:600;background:#fff;border:2px solid var(--line);border-radius:12px;padding:.4rem .7rem;cursor:pointer}
+.slots input{width:auto}
+#manual{margin-top:.6rem}
+#fmsg{font-size:.85rem;color:var(--teal);margin-top:.4rem}
+.bro{border:2px solid var(--line);border-radius:16px;margin-bottom:.7rem;background:var(--paper)}
+.bro summary{cursor:pointer;padding:.8rem 1rem;font-family:'Baloo 2',sans-serif;font-size:1.15rem;font-weight:600;list-style:none}
+.bro summary::-webkit-details-marker{display:none}
+.bro summary::after{content:'+';float:right;font-size:1.4rem;line-height:1}
+.bro[open] summary::after{content:'\2013'}
+.bro summary small{display:block;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:400;color:var(--muted)}
+.bro[open] summary{border-bottom:2px solid var(--line)}
+.bro .bb{padding:.8rem 1rem 1rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.9rem}
+.bro h4{font-size:.95rem;margin-bottom:.2rem}
+.bro ul{list-style:disc;padding-left:1.1rem;font-size:.9rem}
+.bro p{font-size:.92rem}
+.bro .warn h4{color:var(--coral)}
+.bro>button{margin:0 1rem 1rem;background:var(--teal);color:#fff;font-size:.85rem}
+.asklog{max-height:380px;overflow:auto;display:flex;flex-direction:column;gap:.5rem;margin-bottom:.6rem}
+.asklog .msg1{white-space:pre-wrap;max-width:90%}
+details.set{margin-top:1rem;font-size:.9rem}
+details.set summary{cursor:pointer;font-weight:700}
+details.set .btn-main{margin-top:.6rem;background:var(--teal);color:#fff}
+#askmode{font-size:.82rem;color:var(--muted);margin-bottom:.5rem}
+body.auto-db label[for=curl],body.auto-db #curl,body.auto-db #cconnect,body.auto-db #cqrs{display:none}
+#qrbox{margin-top:1rem;text-align:center}
+#qrc{width:240px;height:240px;image-rendering:pixelated;background:#fff;border:2px solid var(--line);border-radius:12px}
+#qrbox.big #qrc{width:min(86vw,480px);height:min(86vw,480px)}
+header{position:relative;overflow:hidden;background:linear-gradient(120deg,#0A4A47 0%,#0F6B66 55%,#12857D 100%)}
+header .wrap{position:relative}
+main{position:relative;z-index:1}
+.hero-art{position:absolute;right:-10px;top:0;height:100%;width:min(48%,520px);opacity:.4;pointer-events:none}
+.ecg{stroke-dasharray:1000;stroke-dashoffset:1000;animation:ecg 2.6s ease-out .3s forwards}
+@keyframes ecg{to{stroke-dashoffset:0}}
+@media(max-width:700px){.hero-art{opacity:.18}}
+@media(prefers-reduced-motion:reduce){.ecg{animation:none!important;stroke-dashoffset:0!important}}
+.stats{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1rem;padding:0;background:none}
+.tile{border-radius:20px;padding:1rem 1.1rem;display:flex;flex-direction:column;justify-content:center;gap:.2rem}
+.tile .lb{font-size:.82rem;font-weight:700;opacity:.85}
+.tile .nm{font-family:'Baloo 2',sans-serif;font-size:2.1rem;font-weight:800;line-height:1.05}
+.tile .sb{font-size:.82rem;opacity:.85}
+.t1{background:var(--mint)}
+.t2{background:var(--sun);flex-direction:row;align-items:center;gap:.8rem}
+.t3{background:var(--deep);color:#fff}
+.t4{background:#fff;border:2px solid var(--line)}
+.pb{height:12px;border-radius:6px;background:#fff;overflow:hidden;margin-top:.4rem}
+.pb i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2BB38A,#0F6B66);border-radius:6px;transition:width .6s}
+.badges{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.3rem}
+.bd{display:flex;flex-direction:column;align-items:center;width:52px;text-align:center;font-size:.6rem;line-height:1.15;color:var(--muted)}
+.bd svg{width:34px;height:34px}
+.bd.on{color:var(--ink);font-weight:700}
+.tl{grid-column:1/-1;background:#fff;border:2px solid var(--line)}
+.tl h2{font-size:1.25rem;margin-bottom:.9rem}
+#timeline{position:relative;height:112px;margin:0 1rem}
+#timeline::before{content:'';position:absolute;left:0;right:0;top:55px;height:4px;border-radius:2px;background:var(--line)}
+.band{position:absolute;top:24px;height:64px;background:var(--mint);border-radius:12px}
+.band span{position:absolute;top:-17px;left:6px;font-size:.7rem;color:var(--teal);font-weight:700;white-space:nowrap}
+.tick{position:absolute;top:55px}
+.tick span{position:absolute;top:52px;transform:translateX(-50%);font-size:.7rem;color:var(--muted)}
+.dot{position:absolute;top:44px;width:26px;height:26px;margin-left:-13px;border-radius:50%;border:3px solid;background:#fff;display:grid;place-items:center}
+.dot i{font-style:normal;font-size:.8rem;font-weight:800;line-height:1}
+.dot em{position:absolute;font-style:normal;font-size:.68rem;font-weight:700;white-space:nowrap;left:50%;transform:translateX(-50%)}
+.dot.up em{top:-18px}.dot.dn em{top:29px}
+.dot.ok{border-color:#2BB38A;background:#2BB38A;color:#fff}
+.dot.miss{border-color:var(--coral);color:var(--coral)}
+.dot.wait{border-color:#F4B400;background:#FFF3CF}
+.nowl{position:absolute;top:6px;bottom:6px;width:2px;background:var(--teal)}
+.nowl span{position:absolute;top:-5px;left:5px;font-size:.68rem;font-weight:800;color:var(--teal);white-space:nowrap}
+.legend{display:flex;gap:.9rem;flex-wrap:wrap;font-size:.78rem;margin-top:.6rem;color:var(--muted)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:.3rem;vertical-align:-1px}
+.legend .g{background:#2BB38A}.legend .y{background:#F4B400}.legend .r{background:var(--coral)}.legend .n{background:#DDE6E2}
+.bars{position:relative}
+.bars::after{content:'';position:absolute;left:0;right:0;bottom:118px;border-top:2px dashed rgba(15,107,102,.45)}
+.bars .bar span{height:22px;line-height:22px;margin:0}
+.bars .bar b{font-size:.78rem;height:18px}
+.bars .g i{background:linear-gradient(#2BB38A,#0F6B66)}
+.bars .y i{background:linear-gradient(#FFD65C,#E8A400)}
+.bars .r i{background:linear-gradient(#FF8A7A,#F2604F)}
+.bars .n i{background:#E6D9A8}
+.goalt{position:absolute;right:0;bottom:120px;font-size:.7rem;font-style:normal;color:var(--teal);font-weight:700;background:#FFF3CF;padding:0 .3rem}
+.subh{font-size:1rem;margin:1.2rem 0 .5rem}
+.heat{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;max-width:520px}
+.heat div{aspect-ratio:1;border-radius:6px}
+.heat .g{background:#2BB38A}.heat .y{background:#F4B400}.heat .r{background:var(--coral)}.heat .n{background:#E6EEEA}
+.mealbar{display:flex;align-items:center;gap:4px;margin:.5rem 0;font-size:.7rem;font-weight:700}
+.mealbar span,.mealbar b{padding:.2rem .6rem;border-radius:999px;background:#E6EEEA;color:var(--muted)}
+.mealbar b{background:var(--sun);color:var(--ink)}
+.mealbar span.on{background:var(--teal);color:#fff}
+.light{display:inline-flex;gap:3px;vertical-align:middle;margin-right:.5rem}
+.light b{width:12px;height:12px;border-radius:50%;background:#DDE6E2}
+.light.s1 b:nth-child(1){background:#2BB38A}.light.s2 b:nth-child(2){background:#F4B400}.light.s3 b:nth-child(3){background:#F2604F}
+.sec{border-radius:14px;padding:.7rem .9rem}
+.sec h4{display:flex;align-items:center;gap:.4rem;font-size:.98rem;margin-bottom:.3rem}
+.sec.info{background:#EEF5FF}.sec.shield{background:#EAF8EF}.sec.care{background:#E6F6F4}.sec.alert{background:#FFEDEA}
+.sec.alert h4{color:#9A2517}
+.bro .intro{grid-column:1/-1;font-size:.95rem}
+.plate{display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap;margin-bottom:1.2rem}
+.plate ul{list-style:none;padding:0;font-size:.92rem}
+.plate li{display:flex;align-items:center;gap:.5rem;margin:.3rem 0}
+.plate li i{width:14px;height:14px;border-radius:4px;display:inline-block}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.8rem;flex:1;min-width:260px}
+.fact{border-radius:16px;padding:.8rem 1rem;background:var(--paper);border:2px solid var(--line)}
+.fact b{font-family:'Baloo 2',sans-serif;font-size:1.9rem;line-height:1;display:block;color:var(--teal)}
+.fact span{font-size:.82rem;color:var(--muted)}
+.qz{background:#fff;border:2px solid var(--line);max-width:760px;margin:0 auto}
+.qtopics{display:grid;gap:.8rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:.8rem}
+.qt{text-align:left;border-radius:20px;padding:1rem 1.2rem;background:var(--mint);color:var(--ink);display:flex;flex-direction:column;gap:.3rem}
+.qt:nth-child(2){background:#FFF3CF}
+.qt b{font-family:'Baloo 2',sans-serif;font-size:1.2rem}
+.qt span{font-weight:400;font-size:.9rem}
+.qt em{font-style:normal;font-size:.8rem;color:var(--teal);font-weight:700}
+.qtop{display:flex;justify-content:space-between;font-weight:700;font-size:.9rem;margin-bottom:.4rem}
+.qz .pb{background:var(--mint)}
+.qtext{font-size:1.15rem;font-weight:700;margin:1rem 0;white-space:pre-wrap}
+.qopts{display:grid;gap:.5rem}
+.qo{text-align:left;border-radius:14px;padding:.7rem 1rem;background:#fff;border:2px solid var(--line);color:var(--ink);font-weight:600}
+.qo:hover:not(:disabled){border-color:var(--teal)}
+.qo.right{background:#CDEFD9;border-color:#2BB38A;color:#0B5B33}
+.qo.wrong{background:#FFD9D3;border-color:var(--coral);color:#9A2517}
+.qo:disabled{cursor:default}
+.qfb{margin-top:.8rem;border-radius:14px;padding:.7rem 1rem;font-size:.92rem}
+.qfb.ok{background:#E3F6EA}.qfb.no{background:#FFEDEA}.qfb.hint{background:#FFF3CF}
+.qrow{display:flex;gap:.6rem;justify-content:space-between;margin-top:1rem;flex-wrap:wrap}
+.qres{text-align:center}
+.qres .ringbox{margin:.6rem auto;color:var(--ink)}
+.qres .ringbox .num b{font-size:2.2rem}
+.qres ul{text-align:left;list-style:disc;padding-left:1.1rem;font-size:.9rem;margin:.6rem 0}
+@media print{
+ body{background:#fff}
+ header,main,footer,#alert{display:none!important}
+ #report{display:block;padding:1cm;font-family:Arial,sans-serif;color:#000}
+ #report h1{font-size:20pt;margin-bottom:4pt}
+ #report table{width:100%;border-collapse:collapse;margin:10pt 0}
+ #report th,#report td{border:1px solid #444;padding:5pt 7pt;text-align:left;font-size:10.5pt}
+ #report th{background:#e6e6e6}
+ .sign{display:flex;gap:40pt;margin-top:50pt}
+ .sign div{flex:1;border-top:1px solid #000;padding-top:4pt;font-size:10pt}
+ #report h2{font-size:14pt;margin:10pt 0 3pt}#report ul{margin:3pt 0 3pt 16pt}#report p{margin:3pt 0}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="monBar"></div><div id="monAlert"></div>
+<header><svg class="hero-art" viewBox="0 0 640 220" aria-hidden="true">
+ <path class="ecg" d="M140 150 H150 L170 150 L185 90 L205 200 L225 40 L245 170 L260 150 H420 L440 150 L455 110 L470 170 L482 150 H640" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+ <g transform="translate(440 30) rotate(32)"><rect width="150" height="56" rx="28" fill="#FFC93C"/><path d="M28 0H75V56H28A28 28 0 0 1 28 0Z" fill="#fff"/></g>
+ <g transform="translate(330 60) rotate(-24)"><rect width="84" height="34" rx="17" fill="#fff" opacity=".7"/></g>
+ <circle cx="560" cy="150" r="12" fill="#fff" opacity=".6"/><circle cx="380" cy="30" r="8" fill="#FFC93C"/>
+</svg><div class="wrap">
+ <h1>MediCare Web</h1>
+ <p>Ingatan Digital, Kesihatan Terjamin</p>
+ <div class="top-actions">
+  <button class="btn-main" id="enable">Aktifkan penggera &amp; notifikasi</button>
+  <button class="btn-ghost" id="demo">Isi data contoh</button>
+  <button class="btn-ghost" id="print">Cetak laporan PDF</button>
+ </div>
+ <p id="permInfo" style="font-size:.85rem;margin-top:.6rem"></p>
+ <div class="nav"><button class="on" id="tabMain">Jadual &amp; pemantau</button><button id="tabInfo">Maklumat ubat</button><button id="tabBro">Brosur &amp; tips</button><button id="tabAsk">Tanya doktor (AI)</button><button id="tabQuiz">Kuiz</button></div>
+</div></header>
+
+<main id="viewMain"><div class="wrap grid">
+ <section class="stats">
+  <div class="tile t1"><div class="lb">Dos hari ini</div><div class="nm" id="stDose">0 / 0</div><div class="pb"><i id="stBar"></i></div></div>
+  <div class="tile t2"><svg viewBox="0 0 24 24" width="46" height="46" aria-hidden="true"><path d="M12 2c1 4 6 5.5 6 11a6 6 0 0 1-12 0c0-2.200 1-3.500 2.500-5 0 2 1 3 2 3 0-4-1-6 1.500-9z" fill="#F2604F"/><path d="M12 22a3 3 0 0 1-3-3c0-1.500 1.500-2.500 3-4.500 1.500 2 3 3 3 4.500a3 3 0 0 1-3 3z" fill="#FFC93C"/></svg><div><div class="nm" id="stStreak">0</div><div class="lb">hari berturut-turut</div></div></div>
+  <div class="tile t3"><div class="lb">Ubat seterusnya dalam</div><div class="nm" id="stNext">-</div><div class="sb" id="stNextSub"></div></div>
+  <div class="tile t4"><div class="lb">Lencana <span id="stBadgeN"></span></div><div class="badges" id="badges"></div></div>
+ </section>
+ <section class="tl">
+  <h2>Garis masa hari ini</h2>
+  <div id="timeline"></div>
+  <div class="legend"><span><i class="g"></i>Sudah makan</span><span><i class="y"></i>Menunggu</span><span><i class="r"></i>Terlepas</span></div>
+ </section>
+ <section class="clock">
+  <div>
+   <div class="time" id="clock">--:--:--</div>
+   <div class="date" id="date"></div>
+   <div class="next" id="next">Belum ada jadual.</div>
+   <div class="next" id="tipDay"></div>
+  </div>
+  <div class="ringbox">
+   <svg width="132" height="132" viewBox="0 0 132 132">
+    <circle cx="66" cy="66" r="56" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="14"/>
+    <circle id="ring" cx="66" cy="66" r="56" fill="none" stroke="#FFC93C" stroke-width="14" stroke-linecap="round" stroke-dasharray="351.9" stroke-dashoffset="351.9" style="transition:stroke-dashoffset .6s,stroke .6s"/>
+   </svg>
+   <div class="num"><b id="score">-</b><small>Skor kepatuhan</small></div>
+  </div>
+  <div class="msg" id="scoreMsg">Tambah ubat untuk mula menjejak.</div>
+ </section>
+
+ <section class="listp">
+  <h2>Jadual ubat hari ini</h2>
+  <ul id="list"></ul>
+ </section>
+
+ <section class="formp">
+  <h2>Tambah jadual ubat</h2>
+  <form id="form" autocomplete="off">
+   <label for="fname">Nama ubat</label>
+   <input id="fname" required maxlength="40" placeholder="cth: Vitamin C">
+   <div>
+    
+    <div><label for="fdose">Dos</label><input id="fdose" required maxlength="30" placeholder="cth: 1 biji"></div>
+   </div>
+   <label id="lnote">Nota tambahan</label>
+   <div class="seg" role="radiogroup" aria-labelledby="lnote">
+    <label><input type="radio" name="fnote" value="Sebelum makan"><span>Sebelum makan</span></label>
+    <label><input type="radio" name="fnote" value="Selepas makan" checked><span>Selepas makan</span></label>
+   </div>
+   <label id="ltime">Masa makan ubat</label>
+   <div class="seg" role="radiogroup" aria-labelledby="ltime">
+    <label><input type="radio" name="tmode" value="auto" checked><span>Masa cadangan</span></label>
+    <label><input type="radio" name="tmode" value="manual"><span>Tetapkan sendiri</span></label>
+   </div>
+   <div class="slots" id="slots"></div>
+   <div id="manual" hidden><input id="ftime" type="time" aria-label="Masa"></div>
+   <div id="fmsg"></div>
+   <button class="btn-main" type="submit">Simpan jadual</button>
+  </form>
+ </section>
+
+ <section class="cloudp">
+  <h2>Sambungan awan &amp; pemantau</h2>
+  <label for="cname">Nama pelajar</label>
+  <input id="cname" maxlength="40" placeholder="cth: Ahmad bin Ali">
+  <label for="curl">Firebase Database URL</label>
+  <input id="curl" placeholder="https://projek-anda-default-rtdb.firebaseio.com">
+  <div id="siterow" hidden><label for="csite">Alamat laman web (https://...)</label><input id="csite" placeholder="cth: https://nama-anda.netlify.app"><p class="mi" style="margin-top:.3rem">Laman ini dibuka dalam pratonton atau sebagai fail, jadi pautan tidak sah di telefon. Hoskan laman, kemudian tampal alamatnya di sini, atau terus buka alamat yang dihoskan.</p></div>
+  <label for="clink">Pautan untuk warden / ibu bapa</label>
+  <input id="clink" readonly placeholder="Muncul selepas anda sambung">
+  <button class="btn-main" id="cconnect">Sambung &amp; segerak</button>
+  <button class="btn-ghost" id="ccopy">Salin pautan</button>
+  <button class="btn-ghost" id="cqr" type="button">Kod QR pemantau</button>
+  <button class="btn-ghost" id="cqrs" type="button">QR persediaan</button>
+  <div id="cstat">Pilihan: tanpa sambungan, aplikasi tetap berfungsi dalam peranti ini.</div>
+  <div id="qrbox" hidden><canvas id="qrc" aria-label="Kod QR"></canvas><p class="mi" id="qrcap"></p><button class="btn-ghost" type="button" id="qrbig" style="color:var(--teal);margin-top:.4rem">Besarkan</button></div>
+ </section>
+
+ <section class="chatp">
+  <h2>Mesej pelajar &amp; pemantau</h2>
+  <div id="chatlog"><div class="empty">Belum ada mesej.</div></div>
+  <div class="quick" id="quick"></div>
+  <div class="chatrow"><input id="chatin" maxlength="160" placeholder="Taip mesej..."><button class="btn-main" id="chatsend">Hantar</button></div>
+  <div id="chatnote"></div>
+ </section>
+
+ <section class="chartp">
+  <h2>Graf kepatuhan 7 hari</h2>
+  <div class="bars" id="bars"></div>
+  <h3 class="subh">Kalendar 28 hari</h3>
+  <div class="heat" id="heat"></div>
+  <div class="legend"><span><i class="g"></i>80% ke atas</span><span><i class="y"></i>50 hingga 79%</span><span><i class="r"></i>bawah 50%</span><span><i class="n"></i>tiada data</span></div>
+ </section>
+</div></main>
+<main id="viewInfo" hidden><div class="wrap"><section style="background:#fff;border:2px solid var(--line)">
+ <h2 style="margin-bottom:.6rem">Maklumat ubat</h2>
+ <div class="disc">Maklumat am untuk pendidikan sahaja, bukan pengganti nasihat doktor atau ahli farmasi. Dos sengaja tidak disenaraikan: sentiasa ikut label ubat atau arahan doktor.</div>
+ <div class="info-head"><input id="isearch" placeholder="Cari ubat atau kegunaan..."><span class="mi" id="icount"></span></div>
+ <div class="filters" id="filters"></div>
+ <div class="cards" id="cards"></div>
+</section></div></main>
+<main id="viewBro" hidden><div class="wrap">
+ <section style="background:#fff;border:2px solid var(--line);margin-bottom:1.2rem">
+  <h2 style="margin-bottom:.8rem">Gaya hidup sihat sekilas pandang</h2>
+  <div class="plate">
+   <svg viewBox="0 0 120 120" width="190" height="190" role="img" aria-label="Pinggan sihat: separuh sayur dan buah, suku protein, suku nasi">
+    <g transform="rotate(-90 60 60)" fill="none" stroke-width="26">
+     <circle cx="60" cy="60" r="40" stroke="#37B26C" stroke-dasharray="125.66 251.33"/>
+     <circle cx="60" cy="60" r="40" stroke="#F0A12B" stroke-dasharray="62.83 251.33" stroke-dashoffset="-125.66"/>
+     <circle cx="60" cy="60" r="40" stroke="#FFC93C" stroke-dasharray="62.83 251.33" stroke-dashoffset="-188.5"/>
+    </g>
+    <circle cx="60" cy="60" r="24" fill="#fff"/>
+    <text x="60" y="58" text-anchor="middle" font-size="8" font-weight="700" fill="#17323A">Satu</text>
+    <text x="60" y="68" text-anchor="middle" font-size="8" font-weight="700" fill="#17323A">pinggan</text>
+   </svg>
+   <ul><li><i style="background:#37B26C"></i>Separuh: sayur dan buah</li><li><i style="background:#F0A12B"></i>Suku: lauk protein</li><li><i style="background:#FFC93C"></i>Suku: nasi atau bijirin</li></ul>
+   <div class="facts">
+    <div class="fact"><b>8-10</b><span>jam tidur setiap malam</span></div>
+    <div class="fact"><b>60</b><span>minit aktif setiap hari</span></div>
+    <div class="fact"><b>20</b><span>saat membasuh tangan dengan sabun</span></div>
+    <div class="fact"><b>2x</b><span>memberus gigi sehari</span></div>
+    <div class="fact"><b>20-20-20</b><span>rehatkan mata daripada skrin</span></div>
+   </div>
+  </div>
+ </section>
+ <section style="background:#fff;border:2px solid var(--line)">
+  <h2 style="margin-bottom:.6rem">Tips jaga kesihatan</h2>
+  <div class="cards" id="tips"></div>
+ </section>
+ <section style="background:#fff;border:2px solid var(--line);margin-top:1.2rem">
+  <h2 style="margin-bottom:.6rem">Brosur kesihatan</h2>
+  <div class="disc">Seperti brosur klinik: maksud, tanda, cara mengelak, cara merawat dan bila perlu jumpa doktor. Tekan <b>Cetak brosur</b> untuk simpan sebagai PDF. Maklumat am sahaja, bukan pengganti nasihat doktor.</div>
+  <div class="info-head"><input id="bsearch" placeholder="Cari masalah kesihatan..."></div>
+  <div id="bro"></div>
+ </section>
+</div></main>
+
+<main id="viewAsk" hidden><div class="wrap"><section style="background:#fff;border:2px solid var(--line)">
+ <h2 style="margin-bottom:.6rem">Tanya doktor (AI)</h2>
+ <div class="disc">Jawapan diberi oleh AI untuk tujuan pendidikan. AI bukan doktor, tidak boleh mendiagnosis dan tidak menggantikan nasihat doktor atau ahli farmasi. <b>Kecemasan: hubungi 999.</b></div>
+ <div id="askmode"></div>
+ <div class="asklog" id="asklog"></div>
+ <div class="quick" id="askq"></div>
+ <div class="chatrow"><input id="askin" maxlength="300" placeholder="Taip soalan, cth: Terlupa makan ubat, apa nak buat?"><button class="btn-main" id="asksend">Tanya</button></div>
+ <details class="set"><summary>Tetapan AI (untuk guru atau pembentang)</summary>
+  <label for="akey">Kunci API Anthropic</label>
+  <input id="akey" type="password" placeholder="sk-ant-..." autocomplete="off">
+  <button class="btn-main" type="button" id="asave">Simpan kunci</button>
+  <button class="btn-ghost" type="button" id="adel" style="color:var(--teal);margin-top:.6rem">Padam kunci</button>
+  <p class="mi" style="margin-top:.6rem">Tanpa kunci, soalan dijawab oleh pangkalan pengetahuan dalam aplikasi (luar talian, jawapan terhad). Kunci disimpan dalam pelayar ini sahaja. Gunakan kunci yang mempunyai had perbelanjaan dan jangan kongsi fail atau komputer selepas memasukkannya.</p>
+ </details>
+</section></div></main>
+<main id="viewQuiz" hidden><div class="wrap"><section class="qz" id="quizBox"></section></div></main>
+<footer>MediCare Web &middot; Data disimpan dalam peranti (LocalStorage) dan boleh disegerak ke Firebase</footer>
+
+<div id="alert" role="alertdialog" aria-live="assertive">
+ <h2 id="alertTitle"></h2><div id="alertBody"></div>
+ <div class="acts">
+  <button class="take" id="alertTake">Sudah makan</button>
+  <button class="btn-ghost" id="alertClose">Tutup</button>
+ </div>
+</div>
+
+<div id="report"></div>
+
+<script>
+/* =====================================================================
+   TETAPAN FIREBASE (isi sekali sahaja, lalu semua peranti auto-sambung)
+   Tampal URL Realtime Database anda di antara tanda petikan, contoh:
+   const DEFAULT_DB='https://nama-projek-default-rtdb.asia-southeast1.firebasedatabase.app';
+   ===================================================================== */
+const DEFAULT_DB='https://smart-medicare-2aef6-default-rtdb.asia-southeast1.firebasedatabase.app';
+/* Pilihan: alamat laman web ini selepas dihoskan, cth 'https://nama-anda.netlify.app'.
+   Perlu hanya jika laman dibuka dalam pratonton atau sebagai fail. */
+const SITE_URL='';
+let siteMem='';
+function siteBase(){
+ let u=(siteMem||SITE_URL||'').trim();
+ if(!u){try{u=(localStorage.getItem('medicare_site')||'').trim()}catch(e){}}
+ if(/^https?:\/\/\S+$/i.test(u))return u.split('?')[0].split('#')[0];
+ if(/^(https?|file):$/.test(location.protocol))return location.href.split('?')[0].split('#')[0];
+ return '';
+}
+const $=s=>document.querySelector(s);
+const KEY='medicare_v1';
+const pad=n=>String(n).padStart(2,'0');
+const dk=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const hm=d=>pad(d.getHours())+':'+pad(d.getMinutes());
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const HARI=['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+const BULAN=['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'];
+
+const MON=(new URLSearchParams(location.search).get('pantau')||'').replace(/[^A-Za-z0-9]/g,'');
+const okDb=u=>/^https:\/\/[\w.-]+\.(firebaseio\.com|firebasedatabase\.app)\/?$/i.test(u);
+const DB0=(DEFAULT_DB||'').trim().replace(/\/+$/,''),AUTO=!!DB0&&okDb(DB0);
+let S={meds:[],log:{},fired:{},name:''};
+if(!MON)try{const r=JSON.parse(localStorage.getItem(KEY));if(r&&r.meds)S=Object.assign(S,r)}catch(e){}
+const save=()=>{if(MON)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}push()};
+
+/* ---------- Audio ---------- */
+let ac;
+function audio(){
+ if(!ac){const A=window.AudioContext||window.webkitAudioContext;if(!A)return null;ac=new A()}
+ if(ac.state==='suspended')ac.resume();
+ return ac;
+}
+function beep(){
+ try{
+  const c=audio();if(!c)return;
+  [0,.3,.6,.9,1.2,1.5].forEach((t,i)=>{
+   const o=c.createOscillator(),g=c.createGain(),s=c.currentTime+t;
+   o.type='sine';o.frequency.value=i%2?1175:880;
+   o.connect(g);g.connect(c.destination);
+   g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(.35,s+.03);g.gain.exponentialRampToValueAtTime(.0001,s+.25);
+   o.start(s);o.stop(s+.27);
+  });
+ }catch(e){}
+}
+
+/* ---------- Notifikasi ---------- */
+function permText(){
+ if(!('Notification' in window)){$('#permInfo').textContent='Pelayar ini tidak menyokong notifikasi pop-up. Penggera audio masih berfungsi.';return}
+ const p=Notification.permission;
+ $('#permInfo').textContent=p==='granted'?'Notifikasi aktif. Pastikan tab ini kekal terbuka.':p==='denied'?'Notifikasi disekat. Benarkan di tetapan pelayar (ikon mangga di bar alamat).':'Klik butang di atas untuk mengaktifkan notifikasi dan bunyi.';
+}
+$('#enable').onclick=async()=>{
+ audio();beep();
+ if('Notification' in window&&Notification.permission==='default'){try{await Notification.requestPermission()}catch(e){}}
+ permText();
+};
+
+/* ---------- Penggera ---------- */
+let queue=[],current=null;
+function fire(m){
+ beep();
+ if('Notification' in window&&Notification.permission==='granted'){
+  try{new Notification('Masa makan ubat!',{body:m.name+' - '+m.dose+(m.note?' ('+m.note+')':'')})}catch(e){}
+ }
+ queue.push(m);if(!current)showAlert();
+}
+function showAlert(){
+ current=queue.shift();
+ if(!current){$('#alert').classList.remove('show');return}
+ $('#alertTitle').textContent='Masa makan ubat!';
+ $('#alertBody').textContent=current.name+' - '+current.dose+(current.note?' ('+current.note+')':'')+' ('+current.time+')';
+ $('#alert').classList.add('show');
+}
+$('#alertTake').onclick=()=>{if(current)setTaken(current.id,true);current=null;showAlert()};
+$('#alertClose').onclick=()=>{current=null;showAlert()};
+
+/* ---------- Data ---------- */
+const todayLog=()=>S.log[dk(new Date())]||{};
+function setTaken(id,val){
+ const k=dk(new Date());S.log[k]=S.log[k]||{};
+ if(val)S.log[k][id]='taken';else delete S.log[k][id];
+ save();render();
+}
+function stats(){
+ const now=new Date(),nowHM=hm(now),today=dk(now),out=[];
+ for(let i=6;i>=0;i--){
+  const d=new Date(now);d.setDate(d.getDate()-i);
+  const k=dk(d);let due=0,taken=0;
+  S.meds.forEach(m=>{
+   if(k<m.created)return;
+   if(k<today||nowHM>=m.time){due++;if(S.log[k]&&S.log[k][m.id]==='taken')taken++}
+  });
+  out.push({k,d,due,taken,pct:due?Math.round(taken/due*100):null});
+ }
+ return out;
+}
+
+/* ---------- Paparan ---------- */
+function render(){
+ const now=new Date(),nowHM=hm(now),tl=todayLog();
+ const meds=[...S.meds].sort((a,b)=>a.time.localeCompare(b.time));
+ const ul=$('#list');
+ if(!meds.length){ul.innerHTML='<li class="empty">Belum ada jadual. Tambah ubat pertama anda di sebelah.</li>'}
+ else ul.innerHTML=meds.map(m=>{
+  const taken=tl[m.id]==='taken';
+  const st=taken?['ok','Sudah makan']:nowHM>=m.time?['miss','Belum makan']:['wait','Menunggu'];
+  return `<li class="med"><div class="mt">${esc(m.time)}</div>
+   <div><div class="mn">${esc(m.name)}</div><div class="mi">${esc(m.dose)}${m.note?' &middot; '+esc(m.note):''}</div><span class="chip ${st[0]}">${st[1]}</span></div>
+   <div class="acts"><button class="take" data-act="take" data-id="${m.id}">${taken?'Batal tanda':'Sudah makan'}</button><button class="del" data-act="del" data-id="${m.id}">Padam</button></div></li>`;
+ }).join('');
+ const nx=meds.find(m=>m.time>nowHM&&tl[m.id]!=='taken');
+ $('#next').textContent=!meds.length?'Belum ada jadual.':nx?'Ubat seterusnya: '+nx.name+' pada '+nx.time:'Tiada lagi ubat menunggu hari ini.';
+
+ const st=stats();
+ let D=0,T=0;st.forEach(x=>{D+=x.due;T+=x.taken});
+ const pct=D?Math.round(T/D*100):null;
+ const ring=$('#ring');
+ $('#score').textContent=pct===null?'-':pct+'%';
+ ring.style.strokeDashoffset=351.9*(1-(pct||0)/100);
+ ring.style.stroke=pct===null||pct>=80?'#7CE0B0':pct>=50?'#FFC93C':'#FF8A7A';
+ $('#scoreMsg').textContent=pct===null?'Tambah ubat untuk mula menjejak.':pct>=80?'Cemerlang! Teruskan disiplin anda.':pct>=50?'Boleh diperbaiki. Jangan terlepas dos esok.':'Perlu perhatian. Set penggera dan cuba lagi.';
+ $('#bars').innerHTML=st.map(x=>`<div class="bar ${x.pct===null?'none':''}">${x.pct===null?'':x.pct+'%'}<i style="height:${x.pct===null?4:Math.max(x.pct*1.2,4)}px"></i><span>${HARI[x.d.getDay()].slice(0,3)}</span></div>`).join('');
+}
+$('#list').addEventListener('click',e=>{
+ const b=e.target.closest('button');if(!b)return;
+ const id=b.dataset.id;
+ if(b.dataset.act==='take')setTaken(id,todayLog()[id]!=='taken');
+ else if(b.dataset.act==='del'&&confirm('Padam jadual ini?')){
+  S.meds=S.meds.filter(m=>m.id!==id);save();render();
+ }
+});
+const SLOTS={
+ 'Sebelum makan':[['07:00','Pagi, sebelum sarapan'],['12:30','Tengah hari, sebelum makan'],['19:00','Malam, sebelum makan malam'],['22:00','Sebelum tidur']],
+ 'Selepas makan':[['08:00','Pagi, selepas sarapan'],['13:30','Tengah hari, selepas makan'],['20:00','Malam, selepas makan malam'],['22:00','Sebelum tidur']]
+};
+const curNote=()=>(document.querySelector('input[name=fnote]:checked')||{}).value||'Selepas makan';
+const tmode=()=>(document.querySelector('input[name=tmode]:checked')||{}).value||'auto';
+function drawSlots(){
+ const keep=[...document.querySelectorAll('#slots input:checked')].map(i=>i.value);
+ $('#slots').innerHTML=SLOTS[curNote()].map(x=>`<label><input type="checkbox" value="${x[0]}" ${keep.includes(x[0])?'checked':''}> ${x[1]} (${x[0]})</label>`).join('');
+ if(!document.querySelector('#slots input:checked'))document.querySelector('#slots input').checked=true;
+ const m=tmode()==='manual';$('#slots').hidden=m;$('#manual').hidden=!m;
+}
+document.querySelectorAll('input[name=fnote],input[name=tmode]').forEach(i=>i.addEventListener('change',drawSlots));
+drawSlots();
+$('#form').addEventListener('submit',e=>{
+ e.preventDefault();
+ const times=tmode()==='manual'?[$('#ftime').value]:[...document.querySelectorAll('#slots input:checked')].map(i=>i.value);
+ if(!times.length||!times[0]){$('#fmsg').textContent='Pilih sekurang-kurangnya satu masa.';return}
+ const name=$('#fname').value.trim(),dose=$('#fdose').value.trim(),note=curNote();
+ times.forEach((t,i)=>S.meds.push({id:'m'+Date.now()+i+Math.floor(Math.random()*999),name,time:t,dose,note,created:dk(new Date())}));
+ $('#fmsg').textContent=times.length+' jadual ditambah.';
+ save();e.target.reset();drawSlots();render();
+});
+
+/* ---------- Jam & semakan ---------- */
+function tick(){
+ const n=new Date();
+ $('#clock').textContent=pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds());
+ $('#date').textContent=HARI[n.getDay()]+', '+n.getDate()+' '+BULAN[n.getMonth()]+' '+n.getFullYear();
+ if(MON){if(n.getSeconds()===0)render();return}
+ const today=dk(n),nowHM=hm(n),tl=todayLog();
+ Object.keys(S.fired).forEach(k=>{if(!k.startsWith(today))delete S.fired[k]});
+ S.meds.forEach(m=>{
+  const key=today+'|'+m.id;
+  if(m.time===nowHM&&!S.fired[key]&&tl[m.id]!=='taken'){S.fired[key]=1;save();fire(m)}
+ });
+ if(n.getSeconds()===0)render();
+}
+
+/* ---------- Data contoh untuk demo juri ---------- */
+$('#demo').onclick=()=>{
+ const c=new Date();c.setDate(c.getDate()-6);const created=dk(c);
+ const n=new Date();n.setMinutes(n.getMinutes()+1);
+ const base=[['Vitamin C','08:00','1 biji','Selepas makan'],['Ubat demam','13:00','2 biji','Selepas makan'],['Ubat demo (bunyi dalam 1 min)',hm(n),'1 biji','Sebelum makan']];
+ base.forEach((b,i)=>{
+  const id='d'+Date.now()+i;
+  S.meds.push({id,name:b[0],time:b[1],dose:b[2],note:b[3],created:i<2?created:dk(new Date())});
+  if(i<2)for(let j=6;j>=1;j--){const d=new Date();d.setDate(d.getDate()-j);const k=dk(d);S.log[k]=S.log[k]||{};if(Math.random()<.8)S.log[k][id]='taken'}
+ });
+ save();render();
+};
+
+/* ---------- Laporan cetak ---------- */
+$('#print').onclick=()=>{
+ if(!S.name){const n=prompt('Nama pelajar untuk laporan:','');if(n===null)return;S.name=n.trim();save()}
+ const st=stats(),now=new Date();
+ let D=0,T=0;st.forEach(x=>{D+=x.due;T+=x.taken});
+ const pct=D?Math.round(T/D*100):0;
+ const medRows=S.meds.map(m=>{
+  let d=0,t=0;st.forEach(x=>{if(x.k<m.created)return;const isToday=x.k===dk(now);if(!isToday||hm(now)>=m.time){d++;if(S.log[x.k]&&S.log[x.k][m.id]==='taken')t++}});
+  return `<tr><td>${esc(m.name)}</td><td>${esc(m.dose)}</td><td>${esc(m.time)}</td><td>${t} / ${d}</td></tr>`;
+ }).join('')||'<tr><td colspan="4">Tiada jadual ubat.</td></tr>';
+ const dayRows=st.map(x=>`<tr><td>${HARI[x.d.getDay()]}, ${x.d.getDate()} ${BULAN[x.d.getMonth()]}</td><td>${x.taken} / ${x.due}</td><td>${x.pct===null?'-':x.pct+'%'}</td></tr>`).join('');
+ $('#report').innerHTML=`<h1>Laporan Kepatuhan Ubat - MediCare Web</h1>
+  <p><b>Nama pelajar:</b> ${esc(S.name)}<br><b>Tarikh laporan:</b> ${now.getDate()} ${BULAN[now.getMonth()]} ${now.getFullYear()}<br><b>Skor kepatuhan 7 hari:</b> ${pct}% (${T} daripada ${D} dos)</p>
+  <h3>Senarai ubat</h3><table><tr><th>Ubat</th><th>Dos</th><th>Masa</th><th>Dimakan (7 hari)</th></tr>${medRows}</table>
+  <h3>Rekod harian</h3><table><tr><th>Hari</th><th>Dos dimakan</th><th>Kepatuhan</th></tr>${dayRows}</table>
+  <div class="sign"><div>Tandatangan warden / ibu bapa</div><div>Tarikh</div></div>
+  <p style="font-size:9pt;margin-top:20pt">Dijana oleh MediCare Web. Laporan ini bukan pengganti nasihat doktor.</p>`;
+ window.print();
+};
+
+/* ---------- Awan: Firebase Realtime Database (REST + SSE) ---------- */
+let cfg={};try{cfg=JSON.parse(localStorage.getItem('medicare_cloud'))||{}}catch(e){}
+const cloudUrl=(u,c)=>u.replace(/\/+$/,'')+'/medicare/'+c+'.json';
+const nodeUrl=(u,c,k)=>u.replace(/\/+$/,'')+'/medicare/'+c+'/'+k+'.json';
+const cstat=t=>{$('#cstat').textContent=t};
+function newCode(){const a='ABCDEFGHJKMNPQRSTUVWXYZ23456789',r=new Uint8Array(8);crypto.getRandomValues(r);return[...r].map(x=>a[x%a.length]).join('')}
+function showLink(){$('#clink').value=cfg.code&&siteBase()?siteBase()+'?pantau='+cfg.code+(AUTO?'':'&db='+encodeURIComponent(cfg.url)):''}
+let pushT;
+function push(){
+ if(MON||!cfg.url||!cfg.code)return;
+ clearTimeout(pushT);
+ pushT=setTimeout(async()=>{
+  try{
+   const put=(k,v)=>fetch(nodeUrl(cfg.url,cfg.code,k),{method:'PUT',body:JSON.stringify(v)});
+   const rs=await Promise.all([put('meds',S.meds),put('log',S.log),put('name',S.name||''),put('updated',Date.now())]);
+   const r={ok:rs.every(x=>x.ok),status:(rs.find(x=>!x.ok)||{}).status};
+   cstat(r.ok?'Disegerak pada '+hm(new Date())+'. Kod: '+cfg.code:'Gagal segerak (ralat '+r.status+'). Semak peraturan (rules) database.');
+  }catch(e){cstat('Tiada internet. Data selamat dalam peranti dan akan disegerak semula.')}
+ },400);
+}
+if(!MON){
+ $('#cname').value=S.name||'';$('#curl').value=cfg.url||'';showLink();
+ $('#cname').addEventListener('input',e=>{S.name=e.target.value.trim();save()});
+ $('#cconnect').onclick=()=>{
+  const u=$('#curl').value.trim();
+  if(!okDb(u)){cstat('URL tidak sah. Salin dari Firebase Console > Realtime Database.');return}
+  cfg={url:u.replace(/\/+$/,''),code:cfg.code||newCode()};
+  try{localStorage.setItem('medicare_cloud',JSON.stringify(cfg))}catch(e){}
+  showLink();cstat('Menyambung...');push();watchStudent();
+ };
+ $('#ccopy').onclick=async()=>{
+  const i=$('#clink');if(!i.value)return;i.select();
+  try{await navigator.clipboard.writeText(i.value);cstat('Pautan disalin. Hantar kepada warden atau ibu bapa.')}catch(e){cstat('Tekan Ctrl+C untuk salin pautan.')}
+ };
+ if(cfg.url)push();
+}
+
+/* ---------- Mesej pelajar <-> pemantau ---------- */
+const MYROLE=MON?'pemantau':'pelajar';
+const room=()=>MON?{url:new URLSearchParams(location.search).get('db')||(AUTO?DB0:''),code:MON}:cfg;
+let msgs=[],msgInit=false,msgLast=0,watching=false;
+function drawChat(){
+ const box=$('#chatlog');
+ box.innerHTML=msgs.length?msgs.map(m=>`<div class="msg1 ${m.from===MYROLE?'me':''}"><small>${m.from==='pemantau'?'Pemantau':esc(S.name||'Pelajar')} &middot; ${hm(new Date(+m.t||Date.now()))}</small>${esc(m.text)}</div>`).join(''):'<div class="empty">Belum ada mesej.</div>';
+ box.scrollTop=box.scrollHeight;
+}
+function setMsgs(o){
+ const arr=o?Object.values(o).filter(m=>m&&typeof m.text==='string').sort((a,b)=>a.t-b.t).slice(-50):[];
+ const inc=arr.filter(m=>m.from!==MYROLE),last=inc.length?+inc[inc.length-1].t||0:0;
+ if(msgInit&&last>msgLast){
+  beep();
+  if('Notification' in window&&Notification.permission==='granted'){try{new Notification('Mesej baharu',{body:inc[inc.length-1].text.slice(0,100)})}catch(e){}}
+ }
+ msgInit=true;msgLast=Math.max(msgLast,last);msgs=arr;drawChat();
+}
+async function sendMsg(text){
+ text=String(text).trim().slice(0,160);const r=room();
+ if(!text)return;
+ if(!r.url||!r.code||!okDb(r.url)){$('#chatnote').textContent='Sambung ke Firebase dahulu untuk bermesej.';return}
+ try{
+  const res=await fetch(nodeUrl(r.url,r.code,'msgs'),{method:'POST',body:JSON.stringify({from:MYROLE,text,t:Date.now()})});
+  if(!res.ok)throw 0;
+  $('#chatnote').textContent='';
+  msgs.push({from:MYROLE,text,t:Date.now()});drawChat();
+ }catch(e){$('#chatnote').textContent='Mesej gagal dihantar. Semak internet dan peraturan database.'}
+}
+$('#chatsend').onclick=()=>{const i=$('#chatin');sendMsg(i.value);i.value=''};
+$('#chatin').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#chatsend').click()}});
+const QUICK=MON?['Dah makan ubat?','Sila makan ubat sekarang','Jaga diri, cepat sembuh']:['Dah makan ubat','Saya terlupa, makan sekarang','Terima kasih'];
+$('#quick').innerHTML=QUICK.map(q=>`<button type="button">${esc(q)}</button>`).join('');
+$('#quick').addEventListener('click',e=>{const b=e.target.closest('button');if(b)sendMsg(b.textContent)});
+function watchStudent(){
+ const r=room();
+ if(MON||watching||!r.url||!r.code||!okDb(r.url))return;
+ watching=true;
+ let pt;
+ const pullMsgs=async()=>{try{setMsgs(await (await fetch(nodeUrl(r.url,r.code,'msgs'))).json())}catch(e){}};
+ const kick=()=>{clearTimeout(pt);pt=setTimeout(pullMsgs,300)};
+ pullMsgs();
+ try{const es=new EventSource(cloudUrl(r.url,r.code));es.addEventListener('put',kick);es.addEventListener('patch',kick)}catch(e){}
+ setInterval(pullMsgs,30000);
+}
+if(!MON&&cfg.url)watchStudent();
+
+/* ---------- Maklumat ubat ---------- */
+const U=(c,t,n,k,w,s,p)=>({c,t,n,k,w,s,p});
+const SM='Selepas makan',SB='Sebelum makan';
+const UBAT=[
+ U('Demam & sakit','otc','Paracetamol','Melegakan demam dan sakit ringan seperti sakit kepala atau sakit gigi.','Sebelum atau selepas makan',SM,['Jangan melebihi dos pada label.','Elakkan mengambil bersama ubat selsema lain yang juga mengandungi paracetamol.','Dos berlebihan boleh merosakkan hati.']),
+ U('Demam & sakit','otc','Ibuprofen','Melegakan sakit, radang dan demam.','Selepas makan',SM,['Boleh mengganggu perut, jadi ambil bersama atau selepas makanan.','Tanya doktor atau ahli farmasi jika ada gastrik teruk, asma atau masalah buah pinggang.']),
+ U('Demam & sakit','farm','Asid mefenamik','Melegakan sakit haid, sakit gigi dan sakit otot.','Selepas makan',SM,['Ambil bersama makanan untuk mengurangkan gangguan perut.','Tidak sesuai untuk yang ada ulser perut, asma atau masalah buah pinggang.','Jangan guna lebih seminggu tanpa nasihat doktor.']),
+ U('Demam & sakit','otc','Aspirin','Melegakan sakit dan demam. Doktor juga menggunakannya untuk mencegah bekuan darah.','Selepas makan',SM,['Jangan diberi kepada kanak-kanak dan remaja bawah 16 tahun yang demam atau sakit akibat virus kerana risiko sindrom Reye.','Boleh mengganggu perut dan meningkatkan risiko pendarahan.']),
+
+ U('Selsema & batuk','farm','Ubat batuk kering (cth: dextromethorphan)','Mengurangkan batuk kering yang mengganggu tidur.','Ikut label',SM,['Tidak sesuai untuk batuk berkahak kerana kahak perlu dikeluarkan.','Boleh menyebabkan mengantuk atau pening.','Jangan gabungkan dengan ubat batuk atau selsema lain tanpa menyemak kandungan.']),
+ U('Selsema & batuk','farm','Pelega kahak (cth: bromhexine, guaifenesin)','Mencairkan kahak supaya lebih mudah dikeluarkan.','Selepas makan',SM,['Minum air secukupnya.','Jumpa doktor jika batuk melebihi dua minggu, berdarah atau disertai sesak nafas.']),
+ U('Selsema & batuk','otc','Semburan hidung garam (saline)','Melembapkan dan membersihkan hidung tersumbat tanpa ubat.','Bila perlu, tidak berkaitan waktu makan',null,['Boleh digunakan kerap.','Gunakan botol sendiri dan jangan kongsi.']),
+ U('Selsema & batuk','otc','Lozenj tekak','Melegakan sakit tekak ringan buat sementara.','Bila perlu, hisap perlahan-lahan',null,['Jumpa doktor jika sakit tekak berpanjangan, demam tinggi atau susah menelan.']),
+
+ U('Alahan & kulit','otc','Antihistamin (cth: cetirizine, loratadine)','Melegakan alahan seperti hidung berair, bersin serta mata dan kulit gatal.','Sebelum atau selepas makan',SM,['Sesetengah jenis menyebabkan mengantuk. Berhati-hati semasa aktiviti yang memerlukan tumpuan.','Baca label untuk had umur.']),
+ U('Alahan & kulit','otc','Chlorpheniramine (CTM)','Melegakan alahan dan selsema alahan.','Selepas makan',SM,['Menyebabkan mengantuk. Elakkan menunggang motosikal atau memandu selepas mengambilnya.','Jangan gabungkan dengan ubat lain yang menyebabkan mengantuk.']),
+ U('Alahan & kulit','farm','Krim hidrokortison','Meredakan ruam, gatal dan radang kulit ringan.','Sapu nipis pada kawasan terjejas',null,['Jangan guna pada muka atau luka kecuali dinasihatkan doktor.','Jangan guna lebih lama daripada tempoh pada label.','Jumpa doktor jika tidak sembuh atau ada tanda jangkitan.']),
+ U('Alahan & kulit','otc','Losyen calamine','Meredakan gatal akibat gigitan serangga atau ruam ringan.','Sapu bila perlu',null,['Hanya untuk kegunaan luar.','Jangan sapu pada luka terbuka.']),
+ U('Alahan & kulit','otc','Antiseptik luka (povidone-iodine)','Membersihkan luka kecil dan mengurangkan risiko jangkitan.','Selepas luka dibasuh bersih',null,['Hanya untuk kegunaan luar.','Tidak sesuai untuk yang alah iodin.','Luka dalam atau gigitan haiwan perlu dilihat doktor.']),
+ U('Alahan & kulit','otc','Krim antikulat (cth: clotrimazole)','Merawat kurap, kutu air dan jangkitan kulit akibat kulat.','Sapu pada kulit yang bersih dan kering',null,['Teruskan sehingga tempoh pada label walaupun gatal sudah hilang.','Jangan kongsi tuala atau pakaian.']),
+
+ U('Perut','otc','Antasid','Melegakan pedih ulu hati dan gastrik ringan.','Selepas makan atau ikut label',SM,['Beri jarak dengan ubat lain kerana boleh mengurangkan penyerapannya. Tanya ahli farmasi.','Jumpa doktor jika gejala berulang.']),
+ U('Perut','otc','Garam rehidrasi oral (ORS)','Menggantikan cecair dan garam apabila cirit-birit atau muntah.','Minum sedikit-sedikit sepanjang hari',null,['Larutkan tepat mengikut arahan pada paket.','Jangan tambah gula atau air melebihi yang diarahkan.','Dapatkan rawatan jika tidak dapat minum atau ada tanda dehidrasi.']),
+ U('Perut','otc','Simetikon','Mengurangkan kembung dan angin dalam perut.','Selepas makan',SM,['Baca label untuk had umur.','Jumpa doktor jika sakit perut teruk atau berpanjangan.']),
+ U('Perut','farm','Ubat sembelit (cth: lactulose)','Melembutkan najis untuk melegakan sembelit.','Ikut label',null,['Banyakkan minum air dan makan makanan berserat.','Jangan guna berpanjangan tanpa nasihat doktor.']),
+
+ U('Vitamin & suplemen','otc','Vitamin C','Suplemen untuk membantu keperluan vitamin harian.','Selepas makan',SM,['Boleh menyebabkan perut tidak selesa jika diambil waktu perut kosong.','Jangan ambil melebihi dos pada label.']),
+ U('Vitamin & suplemen','otc','Pil zat besi (ferum)','Mencegah atau merawat kekurangan zat besi (anemia).','Selepas makan jika perut tidak selesa',SM,['Elakkan diambil serentak dengan teh, kopi, susu atau kalsium kerana mengurangkan penyerapan.','Najis berwarna gelap adalah perkara biasa.','Simpan jauh daripada kanak-kanak kerana berlebihan sangat berbahaya.']),
+ U('Vitamin & suplemen','farm','Asid folik','Membantu pembentukan sel darah. Sering diberi bersama zat besi.','Ikut arahan klinik atau label',SM,['Ikut arahan doktor, klinik atau program sekolah.']),
+ U('Vitamin & suplemen','otc','Vitamin D','Membantu penyerapan kalsium dan kesihatan tulang.','Selepas makan',SM,['Larut dalam lemak, jadi lebih baik diambil bersama makanan.','Jangan melebihi dos label kerana berlebihan boleh mengganggu paras kalsium.']),
+ U('Vitamin & suplemen','otc','Kalsium','Menyokong kesihatan tulang dan gigi.','Selepas makan',SM,['Beri jarak sekitar dua jam daripada pil zat besi.','Jangan melebihi dos pada label.']),
+ U('Vitamin & suplemen','otc','Multivitamin','Melengkapkan pemakanan harian.','Selepas makan',SM,['Tidak menggantikan makanan yang seimbang.','Elakkan mengambil beberapa suplemen serentak tanpa menyemak kandungan.']),
+
+ U('Mata & mulut','otc','Titis mata pelincir','Melegakan mata kering atau letih akibat melihat skrin lama.','Titis bila perlu',null,['Jangan sentuh hujung botol pada mata.','Jumpa doktor jika mata merah, sakit atau penglihatan kabur.']),
+ U('Mata & mulut','farm','Ubat kumur antiseptik (cth: chlorhexidine)','Mengurangkan bakteria mulut dan membantu masalah gusi atau ulser mulut.','Selepas memberus gigi',null,['Jangan ditelan.','Penggunaan lama boleh mewarnakan gigi.','Guna dalam tempoh yang disyorkan sahaja.']),
+
+ U('Preskripsi','rx','Antibiotik (cth: amoxicillin)','Membunuh bakteria. Tidak berkesan terhadap selsema atau demam akibat virus.','Ikut label doktor (ada yang sebelum, ada yang selepas makan)',SM,['Hanya atas preskripsi doktor.','Habiskan sepanjang tempoh yang ditetapkan walaupun sudah rasa sihat.','Jangan kongsi dengan orang lain atau simpan baki untuk kegunaan kemudian.']),
+ U('Preskripsi','rx','Inhaler pelega asma (cth: salbutamol)','Melegakan semput dan sesak nafas dengan cepat.','Apabila ada gejala, ikut arahan doktor',null,['Bawa bersama sentiasa.','Jika perlu guna lebih kerap daripada biasa, segera berjumpa doktor.','Minta jururawat atau ahli farmasi tunjukkan teknik yang betul.']),
+
+ U('Panduan','info','Sebelum makan atau selepas makan?','Memahami dua pilihan nota dalam jadual anda.','',null,['Sebelum makan: perut kosong, biasanya sekitar 30 hingga 60 minit sebelum makan.','Selepas makan: bersama atau sejurus selepas makan supaya perut tidak terganggu.','Jika label ubat berbeza daripada jadual, ikut label atau tanya ahli farmasi.']),
+ U('Panduan','info','Terlupa makan ubat?','Apa yang perlu dibuat jika terlepas satu waktu.','',null,['Ambil apabila teringat, kecuali sudah hampir waktu dos seterusnya.','Jangan ganda dos.','Untuk ubat penting seperti antibiotik atau ubat asma, tanya ahli farmasi atau doktor.']),
+ U('Panduan','info','Cara menyimpan ubat','Menjaga ubat kekal berkesan dan selamat.','',null,['Simpan di tempat sejuk dan kering, jauh daripada cahaya matahari dan bilik air yang lembap.','Simpan dalam bekas tertutup di dalam almari asrama.','Ikut label jika ubat perlu disimpan dalam peti sejuk.','Semak tarikh luput dan buang ubat yang sudah tamat tempoh.']),
+ U('Panduan','info','Jangan kongsi ubat','Kenapa ubat kawan belum tentu sesuai untuk anda.','',null,['Ubat dipilih ikut umur, berat, alahan dan penyakit seseorang.','Ubat yang sama boleh berbahaya jika anda ada alahan atau sedang makan ubat lain.']),
+ U('Panduan','info','Baca label sebelum makan','Maklumat penting yang perlu disemak setiap kali.','',null,['Nama ubat, kegunaan dan had umur.','Waktu makan, tempoh penggunaan dan tarikh luput.','Bahan aktif. Elakkan mengambil dua ubat berbeza yang mengandungi bahan sama.']),
+ U('Panduan','info','Bila perlu jumpa doktor','Tanda yang tidak boleh diabaikan.','',null,['Demam melebihi tiga hari, muntah berterusan atau sakit teruk.','Ruam, bengkak muka atau bibir, atau sukar bernafas selepas makan ubat: berhenti dan dapatkan bantuan kecemasan segera (999).','Gejala tidak bertambah baik walaupun sudah makan ubat.'])
+];
+const CATS=['Semua','Demam & sakit','Selsema & batuk','Alahan & kulit','Perut','Vitamin & suplemen','Mata & mulut','Preskripsi','Panduan'];
+const TLABEL={otc:'Tanpa preskripsi',farm:'Tanya ahli farmasi',rx:'Perlu preskripsi',info:'Panduan'};
+let cat='Semua';
+const CATCOL={'Demam & sakit':'#F2604F','Selsema & batuk':'#4AA3DF','Alahan & kulit':'#B07CE8','Perut':'#F0A12B','Vitamin & suplemen':'#37B26C','Mata & mulut':'#14A3A3','Preskripsi':'#6A55D6','Panduan':'#2F6FD6'};
+function mealOf(w){w=(w||'').toLowerCase();if(w.startsWith('sebelum atau selepas'))return 'both';if(w.startsWith('selepas'))return 'post';if(w.startsWith('sebelum'))return 'pre';return ''}
+function drawInfo(){
+ const q=$('#isearch').value.trim().toLowerCase();
+ $('#filters').innerHTML=CATS.map(c=>`<button type="button" data-c="${esc(c)}" class="${c===cat?'on':''}">${esc(c)}</button>`).join('');
+ const list=UBAT.map((u,i)=>({u,i})).filter(x=>(cat==='Semua'||x.u.c===cat)&&(!q||(x.u.n+' '+x.u.k).toLowerCase().includes(q)));
+ $('#icount').textContent=list.length+' kad';
+ $('#cards').innerHTML=list.map(x=>{
+  const u=x.u,m=mealOf(u.w);
+  const strip=m?`<div class="mealbar"><span class="${m==='pre'||m==='both'?'on':''}">Sebelum</span><b>Makan</b><span class="${m==='post'||m==='both'?'on':''}">Selepas</span></div>`:'';
+  return `<div class="mc" style="border-top:6px solid ${CATCOL[u.c]||'#CBE3D8'}"><span class="chip ${u.t}">${TLABEL[u.t]}</span><h3>${esc(u.n)}</h3><p>${esc(u.k)}</p>${strip}${u.w?`<p><b>Waktu:</b> ${esc(u.w)}</p>`:''}<ul>${u.p.map(t=>'<li>'+esc(t)+'</li>').join('')}</ul>${u.t==='info'?'':`<button type="button" data-i="${x.i}">Tambah ke jadual</button>`}</div>`;
+ }).join('')||'<div class="empty">Tiada hasil dijumpai.</div>';
+}
+$('#filters').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;cat=b.dataset.c;drawInfo()});
+const TABS=['Main','Info','Bro','Ask','Quiz'];
+function showTab(t){TABS.forEach(x=>{const on=x.toLowerCase()===t;$('#view'+x).hidden=!on;$('#tab'+x).classList.toggle('on',on)})}
+TABS.forEach(x=>{$('#tab'+x).onclick=()=>showTab(x.toLowerCase())});
+$('#isearch').addEventListener('input',drawInfo);
+$('#cards').addEventListener('click',e=>{
+ const b=e.target.closest('button');if(!b)return;
+ const u=UBAT[+b.dataset.i];if(!u)return;
+ $('#fname').value=u.n.split(' (')[0];
+ const r=u.s&&document.querySelector('input[name=fnote][value="'+u.s+'"]');if(r){r.checked=true;drawSlots()}
+ showTab('main');$('#form').scrollIntoView();$('#ftime').focus();
+});
+drawInfo();
+
+/* ---------- Brosur, tips & tanya doktor ---------- */
+//DATA-START
+const B=(t,sub,apa,tanda,elak,rawat,dr)=>({t,sub,apa,tanda,elak,rawat,dr});
+const BRO=[
+ B('Demam','Biasanya tanda badan melawan jangkitan','Demam ialah suhu badan yang lebih tinggi daripada biasa, biasanya melebihi 38 darjah Celsius.',['Badan panas, menggigil atau berpeluh','Sakit kepala dan badan lesu','Hilang selera makan'],['Basuh tangan dengan sabun','Jangan berkongsi cawan dan peralatan makan','Tidur cukup dan makan makanan seimbang'],['Rehat dan minum air banyak','Pakai pakaian nipis dan tuam dengan kain basah suam','Paracetamol boleh diambil mengikut label'],['Demam melebihi tiga hari','Demam disertai ruam, sawan, leher kaku atau sesak nafas','Sangat lemah, tidak dapat minum atau terus muntah']),
+ B('Selsema & influenza','Jangkitan virus pada hidung dan tekak','Selsema dan influenza disebabkan virus. Influenza biasanya lebih teruk dengan demam dan sakit badan.',['Hidung berair atau tersumbat, bersin','Sakit tekak dan batuk','Demam dan sakit badan (lebih kerap pada influenza)'],['Basuh tangan dan elak menyentuh muka','Pakai pelitup muka jika batuk atau bersin','Tidur cukup dan tanya doktor tentang vaksin influenza'],['Rehat dan minum air suam banyak','Ubat pelega gejala mengikut label','Antibiotik tidak berkesan terhadap virus'],['Demam melebihi tiga hari','Sesak nafas atau sakit dada','Batuk melebihi dua minggu']),
+ B('Denggi','Disebarkan oleh nyamuk Aedes','Penyakit akibat virus denggi yang disebarkan oleh nyamuk Aedes yang menggigit pada waktu siang.',['Demam tinggi secara mengejut','Sakit kepala teruk dan sakit di belakang mata','Sakit otot dan sendi, ruam, loya'],['Buang air bertakung dalam bekas, pasu dan tayar setiap minggu','Pakai ubat sapu nyamuk dan baju lengan panjang','Pastikan sekitar asrama bebas daripada sampah yang boleh bertakung air'],['Rehat dan minum cecair banyak','Paracetamol sahaja untuk demam','Jangan ambil aspirin atau ibuprofen kerana boleh meningkatkan risiko pendarahan'],['Segera ke klinik untuk ujian darah jika demam disertai tanda denggi','Sakit perut teruk, muntah berterusan, gusi atau hidung berdarah','Sangat letih, gelisah, tangan dan kaki sejuk, terutama apabila demam mula reda']),
+ B('Cirit-birit & keracunan makanan','Najis cair dan risiko dehidrasi','Najis cair lebih daripada tiga kali sehari, biasanya akibat makanan atau air yang tercemar.',['Najis cair dan sakit perut','Loya atau muntah','Tanda dehidrasi: mulut kering, kencing sedikit, pening'],['Basuh tangan sebelum makan dan selepas ke tandas','Makan makanan yang dimasak dan segar','Minum air masak atau air bersih'],['Minum ORS sedikit-sedikit dengan kerap','Teruskan makan makanan ringan seperti bubur atau nasi','Elak minuman bergula pekat dan makanan berminyak'],['Najis berdarah atau hitam','Demam tinggi atau tidak dapat minum','Berterusan lebih dua hari atau ada tanda dehidrasi teruk']),
+ B('Gastrik','Pedih di ulu hati','Rasa pedih atau tidak selesa di ulu hati apabila asid perut mengganggu lapisan perut.',['Pedih atau sebu di ulu hati','Kembung, sendawa dan loya','Rasa sakit apabila lewat makan'],['Makan pada waktu teratur dan jangan lewat','Kurangkan makanan pedas, berminyak, kopi dan minuman bergas','Jangan terus berbaring selepas makan'],['Makan sedikit-sedikit tetapi kerap','Antasid boleh membantu mengikut label','Kurangkan tekanan dan tidur cukup'],['Muntah darah atau najis hitam','Sakit perut teruk atau berpanjangan','Berat badan menurun tanpa sebab atau sukar menelan']),
+ B('Asma','Penyakit saluran pernafasan yang boleh dikawal','Saluran pernafasan menjadi sempit dan sensitif, menyebabkan sesak nafas dan batuk. Asma boleh dikawal dengan rawatan yang betul.',['Sesak nafas atau nafas berbunyi (berdehit)','Batuk terutama pada waktu malam atau selepas bersenam','Dada terasa ketat'],['Kenal pasti pencetus: debu, asap rokok, bulu haiwan, cuaca sejuk','Jemur tilam dan bantal secara berkala','Bawa inhaler pelega ke mana sahaja'],['Guna inhaler mengikut arahan doktor','Duduk tegak dan bertenang semasa serangan','Ikut pelan tindakan asma daripada doktor'],['Tiada kelegaan selepas guna inhaler pelega','Sukar bercakap atau bibir kebiruan: hubungi 999 segera','Perlu guna inhaler lebih kerap daripada biasa']),
+ B('Mata merah','Konjunktivitis','Keradangan pada lapisan mata akibat virus, bakteria atau alahan. Jenis akibat jangkitan mudah berjangkit.',['Mata merah, berair dan gatal','Kelopak mata bengkak dan ada tahi mata','Rasa berpasir pada mata'],['Jangan kongsi tuala, bantal atau alat solek','Basuh tangan dan jangan gosok mata','Pelajar yang berjangkit sebaiknya berehat dahulu daripada berkongsi ruang rapat'],['Tuam mata dengan kain bersih dan sejuk','Titis mata pelincir boleh melegakan','Dapatkan rawatan doktor jika disyaki jangkitan bakteria'],['Sakit mata teruk atau penglihatan kabur','Mata sangat sensitif kepada cahaya','Banyak nanah atau tidak bertambah baik dalam beberapa hari']),
+ B('Kudis (scabies)','Biasa berlaku di asrama','Jangkitan kulit akibat hama kecil yang menyusup ke dalam kulit. Ia mudah berjangkit melalui sentuhan rapat dan perkongsian barang.',['Gatal teruk, terutama pada waktu malam','Bintik atau ruam di celah jari, pergelangan tangan dan pinggang','Garis halus pada kulit'],['Jangan kongsi tuala, pakaian, cadar atau katil','Jemur tilam dan cadar secara berkala','Laporkan kepada warden jika ramai rakan sebilik mengalami gatal'],['Jumpa doktor untuk krim ubat yang betul','Rawat orang yang rapat serentak mengikut arahan doktor','Basuh pakaian dan cadar dengan air panas dan jemur di bawah matahari'],['Gatal teruk yang mengganggu tidur','Kulit luka, bernanah atau bengkak','Ramai kenalan rapat mengalami gejala yang sama']),
+ B('Kurap & kutu air','Jangkitan kulit akibat kulat','Jangkitan kulit akibat kulat yang membiak di tempat lembap dan berpeluh.',['Ruam bulat bersempadan merah dan bersisik','Gatal','Kulit antara jari kaki merekah atau mengelupas'],['Keringkan badan dan celah jari selepas mandi','Pakai kasut dan stokin yang bersih dan kering','Jangan kongsi tuala atau kasut'],['Sapu krim antikulat sehingga tempoh pada label','Pakai pakaian longgar dan bersih','Basuh tuala dan pakaian dengan kerap'],['Tidak sembuh selepas dua minggu rawatan','Jangkitan pada kulit kepala atau kuku','Kulit bernanah atau sangat meradang']),
+ B('Strok haba & dehidrasi','Bahaya semasa cuaca panas dan aktiviti luar','Keadaan badan terlalu panas dan kekurangan cecair, boleh berlaku semasa aktiviti luar atau cuaca panas.',['Pening, sakit kepala dan sangat dahaga','Kulit panas, merah, berpeluh banyak atau terhenti berpeluh','Keliru, lemah atau pitam'],['Minum air sebelum, semasa dan selepas aktiviti','Elak aktiviti berat pada waktu paling panas','Pakai pakaian longgar dan topi'],['Pindah ke tempat redup dan sejuk','Longgarkan pakaian dan tuam dengan kain sejuk','Beri minum sedikit-sedikit jika sedar'],['Pengsan, keliru atau sawan: hubungi 999 segera','Suhu badan sangat tinggi dan tidak turun','Muntah berterusan']),
+ B('Sakit haid','Senak di perut bawah semasa haid','Kekejangan di bahagian bawah perut semasa atau sebelum haid. Ia biasa dalam kalangan remaja.',['Sakit atau senak di perut bawah','Sakit belakang atau paha','Loya, letih atau rasa tidak selesa'],['Bersenam ringan secara berkala','Makan makanan seimbang dan kurangkan kafein','Tidur cukup dan urus tekanan'],['Tuam perut dengan botol air suam','Senaman ringan seperti berjalan','Ubat pelega sakit mengikut label atau nasihat farmasi'],['Sakit sangat teruk sehingga tidak dapat ke sekolah','Darah haid sangat banyak','Haid tidak datang lebih tiga bulan atau sangat tidak teratur']),
+ B('Jerawat','Masalah kulit biasa remaja','Liang kulit tersumbat oleh minyak dan sel kulit mati, sering berlaku semasa remaja.',['Bintik putih, hitam atau merah','Jerawat bernanah atau benjolan dalam','Kulit berminyak'],['Basuh muka dua kali sehari dengan pencuci yang lembut','Jangan picit jerawat','Jangan kongsi tuala dan jauhkan rambut daripada muka'],['Guna produk jerawat yang sesuai mengikut label','Bersabar kerana hasil mengambil beberapa minggu','Elak produk yang menyebabkan kulit sangat kering'],['Jerawat dalam, sakit atau berparut','Tidak bertambah baik selepas dua hingga tiga bulan','Jerawat menjejaskan keyakinan diri']),
+ B('Sakit kepala','Selalunya berkaitan keletihan dan tekanan','Sakit kepala biasa sering berkaitan keletihan, kurang tidur, kurang minum air, tekanan atau terlalu lama melihat skrin.',['Sakit seperti kepala diikat','Sakit berdenyut pada satu sisi (migrain)','Sensitif kepada cahaya atau bunyi'],['Tidur cukup dan makan teratur','Minum air secukupnya','Rehatkan mata daripada skrin dan urus tekanan'],['Rehat di tempat tenang dan gelap','Minum air dan tuam dahi','Paracetamol mengikut label jika perlu'],['Sakit kepala mendadak yang sangat teruk','Disertai demam, leher kaku, penglihatan kabur atau kelemahan','Selepas hentakan di kepala atau semakin kerap']),
+ B('Tekanan peperiksaan & kesihatan mental','Anda tidak perlu menghadapinya sendirian','Rasa tertekan, cemas atau sedih adalah perkara biasa, tetapi tidak perlu dihadapi sendirian.',['Sukar tidur atau tidur terlalu lama','Hilang minat, mudah marah atau menyendiri','Sakit kepala atau sakit perut tanpa sebab yang jelas'],['Rancang masa belajar dan ambil rehat','Bersenam dan tidur cukup','Bercakap dengan rakan, ibu bapa, warden atau kaunselor'],['Tarik nafas dalam dan perlahan','Pecahkan tugas besar kepada langkah kecil','Dapatkan sokongan kaunselor atau doktor'],['Rasa sedih atau cemas berpanjangan melebihi dua minggu','Terfikir untuk mencederakan diri: beritahu orang dewasa yang dipercayai sekarang atau hubungi 999. Talian Kasih 15999 juga sedia membantu','Sukar menjalani rutin harian']),
+ B('Anemia (kurang zat besi)','Mudah letih dan pucat','Kekurangan sel darah merah atau hemoglobin, selalunya akibat kekurangan zat besi.',['Pucat dan mudah letih','Pening atau jantung berdebar','Sukar menumpukan perhatian'],['Makan hati, daging, ikan, telur, kekacang dan sayur hijau','Makan buah kaya vitamin C bersama makanan zat besi','Elak minum teh atau kopi semasa makan'],['Ambil pil zat besi mengikut arahan doktor atau klinik','Teruskan makanan kaya zat besi','Buat ujian darah untuk pengesahan'],['Sangat letih atau pucat','Sesak nafas semasa aktiviti ringan','Haid terlalu banyak atau berpanjangan'])
+];
+const TIPS=[
+ ['Tidur cukup','Remaja perlu sekitar 8 hingga 10 jam tidur setiap malam. Tidur yang cukup membantu daya tahan badan dan tumpuan belajar.'],
+ ['Minum air secukupnya','Minum air kosong sepanjang hari, terutama selepas bersukan atau semasa cuaca panas. Air kencing berwarna pucat tanda badan cukup cecair.'],
+ ['Suku suku separuh','Isi suku pinggan dengan nasi atau bijirin, suku dengan lauk protein, dan separuh dengan sayur dan buah.'],
+ ['Aktif setiap hari','Remaja disarankan aktif secara sederhana hingga cergas sekurang-kurangnya 60 minit sehari. Boleh dibahagikan kepada beberapa sesi.'],
+ ['Basuh tangan dengan betul','Basuh dengan sabun dan air sekurang-kurangnya 20 saat sebelum makan, selepas ke tandas dan selepas batuk atau bersin.'],
+ ['Rehatkan mata','Setiap 20 minit melihat skrin, pandang objek sejauh kira-kira 6 meter selama 20 saat.'],
+ ['Jaga gigi','Memberus gigi dua kali sehari dengan ubat gigi berfluorida dan kurangkan minuman bergula.'],
+ ['Urus tekanan','Rancang masa belajar, ambil rehat singkat, bersenam dan bercakap dengan rakan, guru atau kaunselor apabila rasa tertekan.'],
+ ['Jaga kebersihan asrama','Jangan kongsi tuala, berus gigi atau pakaian. Jemur tilam dan cadar, dan buang air bertakung untuk mengelak nyamuk Aedes.'],
+ ['Jauhi rokok dan vape','Rokok dan vape mengandungi bahan berbahaya kepada paru-paru dan otak yang sedang membesar. Minta bantuan jika sukar berhenti.'],
+ ['Sarapan setiap hari','Sarapan membantu tenaga dan tumpuan di kelas. Pilih makanan seperti telur, roti bijirin penuh atau oat.'],
+ ['Ambil ubat ikut arahan','Gunakan penggera MediCare dan jangan berhenti ubat sendiri walaupun sudah rasa sihat, kecuali doktor menasihatkan.']
+];
+const STOP=new Set(['yang','dengan','boleh','tidak','apa','macam','mana','saya','adakah','untuk','dan','atau','kalau','bila','kenapa','ini','itu','nak','tak','ada','dari','pada','cara','sama','akan','jika','lagi','ubat','sakit','kena']);
+const wordsOf=t=>new Set(t.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean));
+const DOCS=BRO.map(b=>({k:'b',o:b,t:wordsOf(b.t),a:wordsOf([b.sub,b.apa].concat(b.tanda,b.elak,b.rawat,b.dr).join(' '))}))
+ .concat(UBAT.map(u=>({k:'u',o:u,t:wordsOf(u.n),a:wordsOf([u.k,u.w].concat(u.p).join(' '))})));
+const DF={};DOCS.forEach(d=>new Set([...d.t,...d.a]).forEach(w=>{DF[w]=(DF[w]||0)+1}));
+function localAnswer(question){
+ const q=question.toLowerCase().split(/[^a-z0-9]+/).filter(w=>w.length>=3&&!STOP.has(w));
+ let bb=null,bs=0,bu=null,us=0;
+ DOCS.forEach(d=>{
+  const v=q.reduce((n,w)=>n+((d.t.has(w)?3:d.a.has(w)?1:0)/Math.log(2+(DF[w]||0))),0)*(q.some(w=>d.t.has(w))?1:.6);
+  if(d.k==='b'&&v>bs){bs=v;bb=d.o}
+  if(d.k==='u'&&v>us){us=v;bu=d.o}
+ });
+ const out=[];
+ if(bb&&bs>=1.2)out.push(bb.t+': '+bb.apa+'\n\nCara merawat:\n- '+bb.rawat.join('\n- ')+'\n\nJumpa doktor jika:\n- '+bb.dr.join('\n- '));
+ if(bu&&us>=1.2)out.push(bu.n+': '+bu.k+(bu.w?'\nWaktu: '+bu.w:'')+'\nPerhatian:\n- '+bu.p.join('\n- '));
+ if(!out.length)return 'Maaf, soalan itu belum ada dalam pangkalan pengetahuan aplikasi. Sila tanya ahli farmasi atau doktor. Mod AI penuh boleh diaktifkan oleh guru di Tetapan AI.';
+ return out.join('\n\n---\n\n')+'\n\nIni maklumat am, bukan nasihat perubatan. Sila rujuk doktor atau ahli farmasi jika keliru.';
+}
+//DATA-END
+
+const ICON={
+ info:'<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#C9DEFF"/><path d="M12 11v6M12 7.5v.5" stroke="#1E4A8A" stroke-width="2.2" stroke-linecap="round"/></svg>',
+ shield:'<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z" fill="#BDEBCB" stroke="#0B5B33" stroke-width="1.5"/><path d="M9 12l2 2 4-4" fill="none" stroke="#0B5B33" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ care:'<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="6" fill="#A9E4DD"/><path d="M12 7v10M7 12h10" stroke="#0F6B66" stroke-width="2.6" stroke-linecap="round"/></svg>',
+ alert:'<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 3l10 18H2z" fill="#FFC4BB" stroke="#9A2517" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 10v5M12 17.5v.5" stroke="#9A2517" stroke-width="2" stroke-linecap="round"/></svg>'
+};
+const SEV={'Demam':2,'Selsema & influenza':1,'Denggi':3,'Cirit-birit & keracunan makanan':2,'Gastrik':1,'Asma':3,'Mata merah':2,'Kudis (scabies)':2,'Kurap & kutu air':1,'Strok haba & dehidrasi':3,'Sakit haid':1,'Jerawat':1,'Sakit kepala':1,'Tekanan peperiksaan & kesihatan mental':2,'Anemia (kurang zat besi)':2};
+const SEVT=['','Biasanya ringan','Perlu dipantau','Boleh menjadi serius'];
+function drawBro(){
+ const q=$('#bsearch').value.trim().toLowerCase();
+ const L=a=>'<ul>'+a.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>';
+ $('#bro').innerHTML=BRO.map((b,i)=>({b,i})).filter(x=>!q||(x.b.t+' '+x.b.apa+' '+x.b.sub).toLowerCase().includes(q)).map(x=>{
+  const b=x.b,lv=SEV[b.t]||1;
+  return `<details class="bro"><summary><span class="light s${lv}" title="Tahap perhatian"><b></b><b></b><b></b></span>${esc(b.t)}<small>Tahap perhatian: ${SEVT[lv]}. ${esc(b.sub)}</small></summary><div class="bb"><p class="intro">${esc(b.apa)}</p><div class="sec info"><h4>${ICON.info}Tanda-tanda</h4>${L(b.tanda)}</div><div class="sec shield"><h4>${ICON.shield}Cara mengelak</h4>${L(b.elak)}</div><div class="sec care"><h4>${ICON.care}Cara merawat</h4>${L(b.rawat)}</div><div class="sec alert"><h4>${ICON.alert}Jumpa doktor jika</h4>${L(b.dr)}</div></div><button type="button" data-b="${x.i}">Cetak brosur</button></details>`}).join('')||'<div class="empty">Tiada brosur dijumpai.</div>';
+}
+function printBro(i){
+ const b=BRO[i];if(!b)return;
+ const L=a=>'<ul>'+a.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>';
+ $('#report').innerHTML=`<h1>${esc(b.t)}</h1><p><i>${esc(b.sub)}</i></p><h2>Apa itu?</h2><p>${esc(b.apa)}</p><h2>Tanda-tanda</h2>${L(b.tanda)}<h2>Cara mengelak</h2>${L(b.elak)}<h2>Cara merawat</h2>${L(b.rawat)}<h2>Jumpa doktor jika</h2>${L(b.dr)}<p style="font-size:9pt;margin-top:20pt">Brosur MediCare Web. Maklumat am untuk pendidikan dan bukan pengganti nasihat doktor atau ahli farmasi. Kecemasan: hubungi 999.</p>`;
+ window.print();
+}
+$('#bsearch').addEventListener('input',drawBro);
+$('#bro').addEventListener('click',e=>{const b=e.target.closest('button');if(b)printBro(+b.dataset.b)});
+drawBro();
+$('#tips').innerHTML=TIPS.map(t=>`<div class="mc"><h3>${esc(t[0])}</h3><p>${esc(t[1])}</p></div>`).join('');
+{const d0=new Date(),doy=Math.floor((d0-new Date(d0.getFullYear(),0,0))/864e5),tp=TIPS[doy%TIPS.length];$('#tipDay').textContent='Tip hari ini - '+tp[0]+': '+tp[1]}
+
+/* ---------- Tanya doktor (AI) ---------- */
+const AI_MODEL='claude-sonnet-5-5';
+const AI_SYS='Anda ialah pembantu maklumat kesihatan dalam aplikasi MediCare Web untuk pelajar sekolah dan asrama di Malaysia. Jawab dalam bahasa Melayu yang mudah, mesra dan ringkas (sekitar 150 patah perkataan). Beri maklumat kesihatan am sahaja. Jangan mendiagnosis, jangan mencadangkan dos ubat, dan jangan menasihatkan pengguna berhenti ubat yang dipreskripsi. Untuk soalan tentang ubat atau gejala yang serius, nasihatkan pengguna bertanya doktor atau ahli farmasi. Jika ada tanda kecemasan (sesak nafas, sakit dada, pengsan, sawan, pendarahan teruk, muntah darah, fikiran mencederakan diri), minta pengguna segera menghubungi 999 dan memberitahu orang dewasa yang dipercayai. Jika soalan tiada kaitan dengan kesihatan, tolak dengan sopan. Di akhir jawapan, ingatkan bahawa anda AI dan bukan doktor.';
+const EMERG=/(sesak nafas|susah (untuk )?bernafas|tak (boleh|dapat) bernafas|sakit dada|pengsan|sawan|muntah darah|berak darah|najis berdarah|tercekik|terlebih (dos|makan ubat)|overdose|bengkak (muka|bibir|lidah)|kemalangan)/i;
+const SELFHARM=/(bunuh diri|nak mati|mencederakan diri|cederakan diri|tak nak hidup|tamatkan hidup)/i;
+const MSG_EMERG='Ini mungkin kecemasan. Hubungi 999 atau pergi ke jabatan kecemasan terdekat sekarang, dan beritahu warden, guru atau orang dewasa berdekatan supaya membantu anda. Jangan tunggu jawapan aplikasi.';
+const MSG_SELF='Saya risau tentang keselamatan anda. Sila beritahu seseorang yang anda percayai sekarang, seperti warden, guru, kaunselor atau ibu bapa. Jika anda dalam bahaya, hubungi 999. Talian Kasih 15999 juga boleh dihubungi untuk sokongan. Anda tidak perlu menghadapinya sendirian.';
+let aiKey='';try{aiKey=localStorage.getItem('medicare_key')||''}catch(e){}
+const askLog=[{who:'Pembantu AI',text:'Salam! Tanya apa-apa tentang ubat atau masalah kesihatan. Saya bukan doktor, jadi untuk keadaan serius sila jumpa doktor.'}];
+const askHist=[];
+function modeText(){$('#askmode').textContent=aiKey?'Mod: AI (Claude)':'Mod: pangkalan pengetahuan aplikasi (luar talian, jawapan terhad)'}
+function drawAsk(){
+ const box=$('#asklog');
+ box.innerHTML=askLog.map(m=>`<div class="msg1 ${m.me?'me':''}"><small>${esc(m.who)}</small>${esc(m.text)}</div>`).join('');
+ box.scrollTop=box.scrollHeight;
+}
+async function callAI(msgs){
+ const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':aiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:AI_MODEL,max_tokens:600,system:AI_SYS,messages:msgs})});
+ if(!r.ok)throw new Error(r.status);
+ const d=await r.json();
+ return (d.content||[]).filter(x=>x.type==='text').map(x=>x.text).join('\n').trim();
+}
+async function ask(q){
+ q=String(q).trim().slice(0,300);if(!q)return;
+ askLog.push({me:1,who:'Anda',text:q});
+ let ans,who='Pembantu AI';
+ if(SELFHARM.test(q)){ans=MSG_SELF;who='MediCare'}
+ else if(EMERG.test(q)){ans=MSG_EMERG;who='MediCare'}
+ else{
+  askLog.push({who,text:'Sedang menaip...'});drawAsk();
+  try{
+   if(!aiKey)throw 0;
+   ans=await callAI(askHist.concat([{role:'user',content:q}]).slice(-7));
+   if(!ans)throw 0;
+  }catch(e){
+   who='Pangkalan pengetahuan';ans=localAnswer(q);
+   if(aiKey)ans='(AI tidak dapat dihubungi. Semak kunci API dan internet. Jawapan di bawah daripada pangkalan pengetahuan aplikasi.)\n\n'+ans;
+  }
+  askLog.pop();
+ }
+ askLog.push({who,text:ans});
+ askHist.push({role:'user',content:q},{role:'assistant',content:ans});
+ if(askLog.length>40)askLog.splice(0,askLog.length-40);
+ drawAsk();
+}
+$('#asksend').onclick=()=>{const i=$('#askin');const v=i.value;i.value='';ask(v)};
+$('#askin').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#asksend').click()}});
+$('#askq').innerHTML=['Terlupa makan ubat, apa nak buat?','Apa beza sebelum makan dan selepas makan?','Macam mana nak elak denggi?','Bila perlu jumpa doktor kalau demam?'].map(t=>`<button type="button">${esc(t)}</button>`).join('');
+$('#askq').addEventListener('click',e=>{const b=e.target.closest('button');if(b)ask(b.textContent)});
+$('#asave').onclick=()=>{aiKey=$('#akey').value.trim();try{localStorage.setItem('medicare_key',aiKey)}catch(e){}$('#akey').value='';modeText()};
+$('#adel').onclick=()=>{aiKey='';try{localStorage.removeItem('medicare_key')}catch(e){}modeText()};
+modeText();drawAsk();
+
+/* ---------- Infografik: statistik, garis masa, kalendar, lencana ---------- */
+function dayStat(d){
+ const now=new Date(),k=dk(d),today=dk(now),nowHM=hm(now);let due=0,taken=0;
+ S.meds.forEach(m=>{
+  if(k<m.created)return;
+  if(k<today||(k===today&&nowHM>=m.time)){due++;if(S.log[k]&&S.log[k][m.id]==='taken')taken++}
+ });
+ return {k,d,due,taken,pct:due?Math.round(taken/due*100):null};
+}
+function streak(){
+ const now=new Date();let n=0;
+ for(let i=0;i<90;i++){
+  const d=new Date(now);d.setDate(d.getDate()-i);const x=dayStat(d);
+  if(i===0&&(x.due===0||x.taken<x.due))continue;
+  if(x.due>0&&x.taken===x.due)n++;else break;
+ }
+ return n;
+}
+function drawViz(){
+ const now=new Date(),nowHM=hm(now),nowMin=now.getHours()*60+now.getMinutes(),tl=todayLog();
+ const meds=[...S.meds].sort((a,b)=>a.time.localeCompare(b.time));
+ const total=meds.length,done=meds.filter(m=>tl[m.id]==='taken').length;
+ $('#stDose').textContent=done+' / '+total;
+ $('#stBar').style.width=(total?done/total*100:0)+'%';
+ const st=streak();$('#stStreak').textContent=st;
+ const nx=meds.find(m=>m.time>nowHM&&tl[m.id]!=='taken');
+ if(nx){const t=nx.time.split(':'),diff=(+t[0]*60+ +t[1])-nowMin;
+  $('#stNext').textContent=diff>=60?Math.floor(diff/60)+' j '+(diff%60)+' min':diff+' min';
+  $('#stNextSub').textContent=nx.name+' ('+nx.time+')'}
+ else{$('#stNext').textContent='-';$('#stNextSub').textContent=total?'Tiada ubat menunggu hari ini':'Belum ada jadual'}
+
+ const X=m=>Math.max(0,Math.min(100,(m-300)/10.8));
+ let h='';
+ [[420,510,'Sarapan'],[750,870,'Makan tengah hari'],[1170,1290,'Makan malam']].forEach(b=>{h+=`<div class="band" style="left:${X(b[0])}%;width:${X(b[1])-X(b[0])}%"><span>${b[2]}</span></div>`});
+ [6,9,12,15,18,21].forEach(t=>{h+=`<div class="tick" style="left:${X(t*60)}%"><span>${pad(t)}:00</span></div>`});
+ meds.forEach((m,i)=>{
+  const t=m.time.split(':'),mm=+t[0]*60+ +t[1],tk=tl[m.id]==='taken',c=tk?'ok':mm<=nowMin?'miss':'wait';
+  h+=`<div class="dot ${c} ${i%2?'dn':'up'}" style="left:${X(mm)}%" title="${esc(m.name)}"><i>${tk?'&#10003;':c==='miss'?'!':''}</i><em>${esc(m.time)}</em></div>`;
+ });
+ h+=`<div class="nowl" style="left:${X(nowMin)}%"><span>Sekarang</span></div>`;
+ $('#timeline').innerHTML=h;
+
+ const all=[];for(let i=27;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);all.push(dayStat(d))}
+ const cl=x=>x.pct===null?'n':x.pct>=80?'g':x.pct>=50?'y':'r';
+ $('#bars').innerHTML=all.slice(-7).map(x=>`<div class="bar ${cl(x)}"><b>${x.pct===null?'':x.pct+'%'}</b><i style="height:${x.pct===null?4:Math.max(x.pct*1.2,4)}px"></i><span>${HARI[x.d.getDay()].slice(0,3)}</span></div>`).join('')+'<em class="goalt">Sasaran 80%</em>';
+ $('#heat').innerHTML=all.map(x=>`<div class="${cl(x)}" title="${x.d.getDate()} ${BULAN[x.d.getMonth()]}: ${x.pct===null?'tiada data':x.pct+'%'}"></div>`).join('');
+
+ const wk=all.slice(-7),D=wk.reduce((a,x)=>a+x.due,0),T=wk.reduce((a,x)=>a+x.taken,0);
+ const ever=Object.keys(S.log).some(k=>Object.keys(S.log[k]||{}).length);
+ const BD=[[ever,'Langkah pertama','#37B26C'],[st>=3,'Streak 3 hari','#F2604F'],[st>=7,'Pejuang 7 hari','#6A55D6'],[D>=5&&T/D>=.9,'Skor cemerlang','#F0A12B'],[!!MON||!!(cfg&&cfg.url),'Dipantau','#14A3A3'],[Object.values(quizBest).some(v=>v>=80),'Juara kuiz','#2F6FD6']];
+ $('#stBadgeN').textContent=BD.filter(x=>x[0]).length+' / '+BD.length;
+ $('#badges').innerHTML=BD.map(x=>`<div class="bd ${x[0]?'on':''}" title="${x[1]}"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="${x[0]?x[2]:'#D5DDDA'}"/><polygon points="20,9 23,16.5 31,17 25,22.2 26.8,30 20,25.800 13.2,30 15,22.200 9,17 17,16.500" fill="#fff"/></svg>${x[1]}</div>`).join('');
+}
+
+/* ---------- Kuiz ---------- */
+let quizBest={};try{quizBest=JSON.parse(localStorage.getItem('medicare_quiz'))||{}}catch(e){}
+const Q=(q,ans,w1,w2,w3,e,h)=>({q,o:[ans,w1,w2,w3],e,h});
+const QUIZ={
+ kes:{title:'Kuiz Kesihatan & Ubat',desc:'Uji ilmu daripada brosur, tips dan maklumat ubat dalam aplikasi ini.',qs:[
+  Q('Berapa jam tidur yang disarankan untuk remaja setiap malam?','8 hingga 10 jam','4 hingga 5 jam','6 jam sahaja','12 hingga 14 jam','Remaja memerlukan sekitar 8 hingga 10 jam tidur untuk daya tahan badan dan tumpuan belajar.','Lebih banyak daripada yang kebanyakan orang sangka.'),
+  Q('Mengapa aspirin tidak sesuai untuk remaja bawah 16 tahun yang demam?','Risiko sindrom Reye','Ia menyebabkan rambut gugur','Ia tidak berkesan langsung','Ia menyebabkan tulang rapuh','Aspirin pada kanak-kanak dan remaja yang demam atau sakit akibat virus dikaitkan dengan sindrom Reye, penyakit yang jarang tetapi serius.','Ia berkaitan dengan hati dan otak.'),
+  Q('Anda terlupa makan ubat. Apa yang sepatutnya dilakukan?','Ambil apabila teringat, tetapi jangan ganda dos','Ganda dos pada waktu seterusnya','Berhenti makan ubat terus','Tunggu sehingga hari esok','Jangan ganda dos. Untuk ubat penting seperti antibiotik atau ubat asma, tanya ahli farmasi atau doktor.','Jangan sekali-kali ganda dos.'),
+  Q('"Sebelum makan" pada label ubat biasanya bermaksud...','Perut kosong, sekitar 30 hingga 60 minit sebelum makan','Sejurus selepas makan','Semasa tidur','Bila-bila masa sahaja','Sebelum makan bermaksud perut kosong. Selepas makan bermaksud bersama atau sejurus selepas makan supaya perut tidak terganggu.','Bagaimana keadaan perut anda?'),
+  Q('Anda disyaki demam denggi. Ubat demam yang sesuai ialah...','Paracetamol','Aspirin','Ibuprofen','Asid mefenamik','Aspirin dan ibuprofen boleh meningkatkan risiko pendarahan, jadi hanya paracetamol disyorkan untuk demam denggi. Jumpa doktor untuk ujian darah.','Elakkan ubat yang menambah risiko pendarahan.'),
+  Q('Antibiotik yang dipreskripsi doktor patut...','Dihabiskan sepanjang tempoh yang ditetapkan walaupun sudah sihat','Dihentikan apabila demam sudah kebah','Dikongsi dengan kawan yang sakit sama','Disimpan bakinya untuk kegunaan akan datang','Menghentikan antibiotik awal boleh menyebabkan bakteria hidup semula dan lebih sukar dirawat. Jangan kongsi atau simpan baki.','Jangan berhenti awal.'),
+  Q('Berapa lama sepatutnya anda membasuh tangan dengan sabun dan air?','Sekurang-kurangnya 20 saat','3 saat','5 saat','Sehingga tangan kering sahaja','Basuh dengan sabun sekurang-kurangnya 20 saat sebelum makan, selepas ke tandas dan selepas batuk atau bersin.','Kira dua kali nyanyian "Selamat Hari Jadi".'),
+  Q('Rakan anda sesak nafas teruk dan bibirnya kebiruan. Apa tindakan segera?','Hubungi 999 dan beritahu orang dewasa','Tunggu sehingga esok','Beri ubat batuk','Suruh dia tidur','Sesak nafas teruk dengan bibir kebiruan ialah kecemasan. Hubungi 999 dan dapatkan bantuan orang dewasa.','Ini kecemasan.'),
+  Q('Menurut pinggan sihat (Suku Suku Separuh), separuh pinggan diisi dengan...','Sayur dan buah','Nasi','Lauk protein','Minuman manis','Separuh sayur dan buah, suku protein dan suku nasi atau bijirin.','Lihat rajah di tab Brosur & tips.'),
+  Q('Cara paling berkesan mengelakkan denggi di sekitar asrama ialah...','Membuang air bertakung setiap minggu','Menutup lampu pada waktu siang','Makan ubat setiap hari','Tidak keluar bilik pada waktu malam','Nyamuk Aedes membiak dalam air bertakung. Buang air dalam bekas, pasu dan tayar setiap minggu.','Di mana nyamuk bertelur?')
+ ]},
+ kod:{title:'Kuiz Struktur Kod Arahan',desc:'Jujukan, pilihan dan ulangan dengan contoh daripada MediCare Web.',qs:[
+  Q('Struktur kawalan yang melaksanakan arahan satu demi satu mengikut turutan ialah...','Jujukan','Pilihan','Ulangan','Rekursi','Struktur jujukan melaksanakan arahan mengikut urutan dari atas ke bawah. Dalam MediCare Web, langkah membaca borang, mencipta jadual, menyimpan dan memaparkan berjalan secara berjujukan.','Fikirkan resipi: langkah 1, 2, 3.'),
+  Q('Struktur pilihan (if / else) digunakan apabila atur cara perlu...','Membuat keputusan berdasarkan syarat','Mengulang arahan beberapa kali','Menyimpan data dalam pangkalan data','Memadam semua pemboleh ubah','Struktur pilihan menguji satu syarat. Jika syarat benar, satu blok arahan dijalankan. Jika palsu, blok lain dijalankan atau dilangkau.','Perkataan kuncinya ialah syarat.'),
+  Q('Pseudokod MediCare Web:\n\nJIKA masa_sekarang == masa_ubat DAN belum_makan\n    BUNYIKAN penggera\n\nStruktur kawalan yang digunakan ialah...','Pilihan','Ulangan','Jujukan sahaja','Tiada struktur kawalan','Penggera hanya berbunyi apabila syarat dipenuhi. Itulah ciri struktur pilihan.','Perhatikan perkataan JIKA.'),
+  Q('Dalam MediCare Web, jam disemak setiap saat menggunakan setInterval supaya penggera tidak terlepas. Ini contoh struktur...','Ulangan','Jujukan','Pilihan','Pengisytiharan pemboleh ubah','Struktur ulangan menjalankan blok arahan yang sama berkali-kali. Gelung yang melukis graf 7 hari juga contoh ulangan.','Arahan yang sama dijalankan berulang kali.'),
+  Q('Dalam carta alir, simbol berbentuk berlian (diamond) mewakili...','Keputusan (syarat ya atau tidak)','Mula atau tamat','Proses','Input atau output','Berlian ialah simbol keputusan. Ia mempunyai dua laluan keluar, iaitu ya dan tidak, sepadan dengan struktur pilihan.','Simbol ini mempunyai dua cabang keluar.'),
+  Q('Berapa kali perkataan "Makan ubat" dipaparkan oleh pseudokod ini?\n\nUNTUK i = 1 HINGGA 3\n    PAPAR "Makan ubat"','3 kali','1 kali','2 kali','4 kali','Gelung berjalan untuk i = 1, 2 dan 3, jadi arahan dilaksanakan 3 kali.','Kira nilai i: 1, 2, 3.')
+ ]}
+};
+let qz={};
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function quizHome(){
+ $('#quizBox').innerHTML=`<h2>Kuiz</h2><p class="mi">Uji pengetahuan anda dan kumpul lencana Juara kuiz dengan skor 80% ke atas.</p><div class="qtopics">${Object.keys(QUIZ).map(k=>{const t=QUIZ[k],b=quizBest[k];return `<button type="button" class="qt" data-act="start" data-k="${k}"><b>${esc(t.title)}</b><span>${esc(t.desc)}</span><em>${t.qs.length} soalan${b!=null?', skor terbaik '+b+'%':''}</em></button>`}).join('')}</div>`;
+}
+function startQuiz(k){
+ const list=shuf(QUIZ[k].qs).map(q=>{const o=shuf(q.o.map((t,i)=>({t,c:i===0})));return {q:q.q,e:q.e,h:q.h,o:o.map(z=>z.t),a:o.findIndex(z=>z.c)}});
+ qz={k,list,i:0,score:0,wrong:[],done:false};showQ();
+}
+function showQ(){
+ const x=qz.list[qz.i],n=qz.list.length;
+ $('#quizBox').innerHTML=`<div class="qtop"><span>Soalan ${qz.i+1} / ${n}</span><span>Skor: ${qz.score}</span></div><div class="pb"><i style="width:${qz.i/n*100}%"></i></div><div class="qtext">${esc(x.q)}</div><div class="qopts">${x.o.map((o,j)=>`<button type="button" class="qo" data-act="ans" data-j="${j}">${esc(o)}</button>`).join('')}</div><div id="qfb" class="qfb" hidden></div><div class="qrow"><button type="button" class="btn-ghost" data-act="hint" style="color:var(--teal)">Petunjuk</button><button type="button" class="btn-main" data-act="next" id="qnext" hidden>${qz.i+1<n?'Soalan seterusnya':'Lihat keputusan'}</button></div>`;
+}
+function answerQ(j){
+ if(qz.done)return;qz.done=true;
+ const x=qz.list[qz.i],ok=j===x.a;
+ if(ok)qz.score++;else qz.wrong.push(x);
+ document.querySelectorAll('#quizBox .qo').forEach((b,k)=>{b.disabled=true;if(k===x.a)b.classList.add('right');else if(k===j)b.classList.add('wrong')});
+ const fb=$('#qfb');fb.hidden=false;fb.className='qfb '+(ok?'ok':'no');
+ fb.innerHTML='<b>'+(ok?'Betul!':'Belum tepat.')+'</b> '+esc(x.e);
+ $('#qnext').hidden=false;
+}
+function finishQ(){
+ const n=qz.list.length,pct=Math.round(qz.score/n*100);
+ if(quizBest[qz.k]==null||pct>quizBest[qz.k]){quizBest[qz.k]=pct;try{localStorage.setItem('medicare_quiz',JSON.stringify(quizBest))}catch(e){}}
+ const msg=pct>=80?'Cemerlang! Anda pakar sebenar.':pct>=50?'Bagus, tetapi boleh lebih baik.':'Jangan putus asa, cuba lagi!';
+ const col=pct>=80?'#2BB38A':pct>=50?'#F4B400':'#F2604F';
+ const rv=qz.wrong.length?`<h3 class="subh">Semak semula</h3><ul>${qz.wrong.map(x=>`<li><b>${esc(x.q.split('\n')[0])}</b><br>Jawapan: ${esc(x.o[x.a])}. ${esc(x.e)}</li>`).join('')}</ul>`:'<p><b>Tiada kesilapan. Sempurna!</b></p>';
+ $('#quizBox').innerHTML=`<div class="qres"><h2>${esc(QUIZ[qz.k].title)}</h2><div class="ringbox"><svg width="132" height="132" viewBox="0 0 132 132"><circle cx="66" cy="66" r="56" fill="none" stroke="#E6EEEA" stroke-width="14"/><circle cx="66" cy="66" r="56" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="round" stroke-dasharray="351.9" stroke-dashoffset="${351.9*(1-pct/100)}"/></svg><div class="num"><b>${pct}%</b><small>${qz.score} / ${n}</small></div></div><p><b>${msg}</b></p>${rv}<div class="qrow"><button type="button" class="btn-main" data-act="start" data-k="${qz.k}">Main semula</button><button type="button" class="btn-ghost" data-act="home" style="color:var(--teal)">Topik lain</button></div></div>`;
+ render();
+}
+$('#quizBox').addEventListener('click',e=>{
+ const b=e.target.closest('button');if(!b||b.disabled)return;
+ const a=b.dataset.act;
+ if(a==='start')startQuiz(b.dataset.k);
+ else if(a==='home')quizHome();
+ else if(a==='ans')answerQ(+b.dataset.j);
+ else if(a==='next'){qz.i++;qz.done=false;qz.i<qz.list.length?showQ():finishQ()}
+ else if(a==='hint'&&!qz.done){const fb=$('#qfb');fb.hidden=false;fb.className='qfb hint';fb.textContent='Petunjuk: '+qz.list[qz.i].h}
+});
+quizHome();
+
+/* ---------- Kod QR (tanpa pustaka luar, berfungsi luar talian) ---------- */
+//QR-START
+function qrMatrix(text){
+ const EXP=new Array(512),LOG=new Array(256);
+ let gx=1;for(let i=0;i<255;i++){EXP[i]=gx;LOG[gx]=i;gx<<=1;if(gx&256)gx^=0x11D}
+ for(let i=255;i<512;i++)EXP[i]=EXP[i-255];
+ const mul=(a,b)=>a&&b?EXP[LOG[a]+LOG[b]]:0;
+ const ECC=[0,10,16,26,18,24,16,18,22,22,26],NB=[0,1,1,1,2,2,4,4,4,5,5];
+ const raw=v=>{let r=(16*v+128)*v+64;if(v>=2){const a=Math.floor(v/7)+2;r-=(25*a-10)*a-55;if(v>=7)r-=36}return r};
+ const bytes=Array.from(new TextEncoder().encode(text));
+ let ver=0;
+ for(let v=1;v<=10;v++){const cap=(Math.floor(raw(v)/8)-ECC[v]*NB[v])*8;if(4+(v<10?8:16)+8*bytes.length<=cap){ver=v;break}}
+ if(!ver)return null;
+ const dataCw=Math.floor(raw(ver)/8)-ECC[ver]*NB[ver];
+ const bits=[];const put=(val,n)=>{for(let i=n-1;i>=0;i--)bits.push((val>>>i)&1)};
+ put(4,4);put(bytes.length,ver<10?8:16);bytes.forEach(b=>put(b,8));
+ const capBits=dataCw*8;
+ put(0,Math.min(4,capBits-bits.length));
+ while(bits.length%8)bits.push(0);
+ for(let p=0xEC;bits.length<capBits;p^=0xEC^0x11)put(p,8);
+ const data=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[i+j];data.push(b)}
+ const nb=NB[ver],el=ECC[ver],total=Math.floor(raw(ver)/8),shortLen=Math.floor(total/nb),numShort=nb-total%nb;
+ let gen=[1];for(let i=0;i<el;i++){const n=new Array(gen.length+1).fill(0);for(let j=0;j<gen.length;j++){n[j]^=gen[j];n[j+1]^=mul(gen[j],EXP[i])}gen=n}
+ const blocks=[],eccs=[];let k=0;
+ for(let i=0;i<nb;i++){
+  const len=shortLen-el+(i<numShort?0:1),d=data.slice(k,k+len);k+=len;
+  const res=new Array(el).fill(0);
+  d.forEach(b=>{const f=b^res.shift();res.push(0);for(let j=0;j<el;j++)res[j]^=mul(gen[j+1],f)});
+  blocks.push(d);eccs.push(res);
+ }
+ const cw=[];
+ for(let i=0;i<=shortLen-el;i++)blocks.forEach(b=>{if(i<b.length)cw.push(b[i])});
+ for(let i=0;i<el;i++)eccs.forEach(e=>cw.push(e[i]));
+ const size=ver*4+17;
+ const M=Array.from({length:size},()=>new Array(size).fill(false)),F=Array.from({length:size},()=>new Array(size).fill(false));
+ const set=(x,y,d)=>{if(x>=0&&y>=0&&x<size&&y<size){M[y][x]=d;F[y][x]=true}};
+ for(let i=0;i<size;i++){set(6,i,i%2===0);set(i,6,i%2===0)}
+ const finder=(cx,cy)=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const d=Math.max(Math.abs(dx),Math.abs(dy));set(cx+dx,cy+dy,d!==2&&d!==4)}};
+ finder(3,3);finder(size-4,3);finder(3,size-4);
+ if(ver>1){
+  const na=Math.floor(ver/7)+2,step=Math.floor((ver*8+na*3+5)/(na*4-4))*2,pos=[6];
+  for(let i=0,p=size-7;i<na-1;i++,p-=step)pos.splice(1,0,p);
+  pos.forEach((px,i)=>pos.forEach((py,j)=>{
+   if((i===0&&j===0)||(i===0&&j===pos.length-1)||(i===pos.length-1&&j===0))return;
+   for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)set(px+dx,py+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1);
+  }));
+ }
+ const bit=(v,i)=>((v>>>i)&1)!==0;
+ const fmt=mask=>{
+  const d=mask;let r=d;for(let i=0;i<10;i++)r=(r<<1)^((r>>>9)*0x537);
+  const b=((d<<10)|r)^0x5412;
+  for(let i=0;i<=5;i++)set(8,i,bit(b,i));
+  set(8,7,bit(b,6));set(8,8,bit(b,7));set(7,8,bit(b,8));
+  for(let i=9;i<15;i++)set(14-i,8,bit(b,i));
+  for(let i=0;i<8;i++)set(size-1-i,8,bit(b,i));
+  for(let i=8;i<15;i++)set(8,size-15+i,bit(b,i));
+  set(8,size-8,true);
+ };
+ fmt(0);
+ if(ver>=7){let r=ver;for(let i=0;i<12;i++)r=(r<<1)^((r>>>11)*0x1F25);const b=(ver<<12)|r;for(let i=0;i<18;i++){const c=bit(b,i),a=size-11+i%3,q=Math.floor(i/3);set(a,q,c);set(q,a,c)}}
+ let idx=0;
+ for(let right=size-1;right>=1;right-=2){
+  if(right===6)right=5;
+  for(let vert=0;vert<size;vert++)for(let j=0;j<2;j++){
+   const x=right-j,up=((right+1)&2)===0,y=up?size-1-vert:vert;
+   if(!F[y][x]&&idx<cw.length*8){M[y][x]=bit(cw[idx>>>3],7-(idx&7));idx++}
+  }
+ }
+ const mask=m=>{for(let y=0;y<size;y++)for(let x=0;x<size;x++)if(!F[y][x]){
+  let inv=false;
+  switch(m){case 0:inv=(x+y)%2===0;break;case 1:inv=y%2===0;break;case 2:inv=x%3===0;break;case 3:inv=(x+y)%3===0;break;case 4:inv=(Math.floor(x/3)+Math.floor(y/2))%2===0;break;case 5:inv=x*y%2+x*y%3===0;break;case 6:inv=(x*y%2+x*y%3)%2===0;break;default:inv=((x+y)%2+x*y%3)%2===0}
+  if(inv)M[y][x]=!M[y][x]}};
+ const penalty=()=>{
+  let p=0,dark=0;
+  const lines=[];
+  for(let y=0;y<size;y++){lines.push(M[y].map(v=>v?1:0).join(''));}
+  for(let x=0;x<size;x++){let s='';for(let y=0;y<size;y++)s+=M[y][x]?1:0;lines.push(s)}
+  lines.forEach(s=>{
+   const runs=s.match(/0+|1+/g);runs.forEach(r=>{if(r.length>=5)p+=3+r.length-5});
+   p+=40*((s.match(/(?=10111010000|00001011101)/g)||[]).length);
+  });
+  for(let y=0;y<size;y++)for(let x=0;x<size;x++){
+   if(M[y][x])dark++;
+   if(x<size-1&&y<size-1&&M[y][x]===M[y][x+1]&&M[y][x]===M[y+1][x]&&M[y][x]===M[y+1][x+1])p+=3;
+  }
+  const t=size*size;p+=(Math.ceil(Math.abs(dark*20-t*10)/t)-1)*10;
+  return p;
+ };
+ let best=0,bp=1e9;
+ for(let m=0;m<8;m++){mask(m);fmt(m);const p=penalty();if(p<bp){bp=p;best=m}mask(m)}
+ mask(best);fmt(best);
+ return M;
+}
+function QRdraw(canvas,text){
+ const M=qrMatrix(text);if(!M)return false;
+ const n=M.length,s=Math.max(4,Math.floor(720/(n+8))),w=(n+8)*s;
+ canvas.width=w;canvas.height=w;
+ const g=canvas.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,w,w);g.fillStyle='#000';
+ for(let y=0;y<n;y++)for(let x=0;x<n;x++)if(M[y][x])g.fillRect((x+4)*s,(y+4)*s,s,s);
+ return true;
+}
+//QR-END
+
+const BASE=siteBase;
+function showQR(text,cap){
+ if(!text){cstat(siteBase()?'Sambung ke Firebase dahulu supaya pautan wujud.':'Isi alamat laman web yang dihoskan dahulu (lihat kotak di atas).');return}
+ if(!QRdraw($('#qrc'),text)){cstat('Pautan terlalu panjang untuk QR. Salin pautan sahaja.');return}
+ $('#qrbox').hidden=false;
+ $('#qrcap').textContent=cap+(location.protocol==='file:'?' Amaran: laman ini dibuka sebagai fail, jadi QR tidak boleh dibuka di telefon. Hoskan laman dahulu (GitHub Pages atau Netlify).':'');
+}
+$('#cqr').onclick=()=>showQR($('#clink').value,'Imbas dengan telefon warden atau ibu bapa untuk membuka skrin pemantau.');
+$('#cqrs').onclick=()=>showQR(cfg.url&&BASE()?BASE()+'?setup='+encodeURIComponent(cfg.url):'','Imbas pada peranti lain untuk mengisi URL Firebase secara automatik.');
+$('#qrbig').onclick=()=>$('#qrbox').classList.toggle('big');
+
+/* ---------- Alamat laman untuk pautan pemantau ---------- */
+if(!MON){
+ $('#siterow').hidden=!(!/^https?:$/.test(location.protocol)&&!SITE_URL);
+ try{siteMem=localStorage.getItem('medicare_site')||''}catch(e){}
+ $('#csite').value=siteMem;
+ $('#csite').addEventListener('input',e=>{siteMem=e.target.value.trim();try{localStorage.setItem('medicare_site',siteMem)}catch(err){}showLink()});
+ showLink();
+}
+
+/* ---------- Sambungan automatik ---------- */
+if(!MON){
+ const sp=new URLSearchParams(location.search).get('setup')||'';
+ if(AUTO){
+  document.body.classList.add('auto-db');
+  if(cfg.url!==DB0){cfg={url:DB0,code:cfg.code||newCode()};try{localStorage.setItem('medicare_cloud',JSON.stringify(cfg))}catch(e){}}
+  $('#curl').value=cfg.url;showLink();cstat('Disambung automatik ke Firebase. Kod anda: '+cfg.code);push();watchStudent();
+ }
+ else if(sp&&okDb(sp)&&!cfg.url){$('#curl').value=sp;cstat('URL Firebase diisi daripada pautan. Klik Sambung & segerak.');showTab('main')}
+}
+
+/* ---------- Mod pemantau (warden / ibu bapa) ---------- */
+const _render=render;
+render=function(){
+ _render();drawViz();
+ const box=$('#monAlert');
+ if(!MON){box.style.display='none';return}
+ const n=new Date(),nm=n.getHours()*60+n.getMinutes(),tl=todayLog();
+ const late=S.meds.filter(m=>{const t=m.time.split(':');return nm-(+t[0]*60+ +t[1])>=10&&tl[m.id]!=='taken'});
+ box.style.display=late.length?'block':'none';
+ box.textContent=late.length?'Amaran: '+late.map(m=>m.name+' ('+m.time+')').join(', ')+' belum dimakan melebihi 10 minit.':'';
+};
+if(MON){
+ document.body.classList.add('mon');
+ const db=new URLSearchParams(location.search).get('db')||(AUTO?DB0:'');
+ if(!okDb(db)){$('#monBar').textContent='Pautan pemantau tidak sah.'}
+ else{
+  const url=cloudUrl(db,MON);
+  const pull=async()=>{
+   try{
+    const d=await (await fetch(url)).json();
+    if(d){S.meds=d.meds||[];S.log=d.log||{};S.name=d.name||'';setMsgs(d.msgs);
+     $('#monBar').textContent='Mod pemantau (baca sahaja): '+(S.name||'pelajar')+' - kemas kini terakhir '+hm(new Date(d.updated||Date.now()))}
+    else $('#monBar').textContent='Kod tidak dijumpai. Semak pautan.';
+    render();
+   }catch(e){$('#monBar').textContent='Tidak dapat menyambung ke pangkalan data.'}
+  };
+  $('#monBar').textContent='Menyambung...';
+  pull();
+  try{const es=new EventSource(url);let pt;const kick=()=>{clearTimeout(pt);pt=setTimeout(pull,300)};es.addEventListener('put',kick);es.addEventListener('patch',kick)}catch(e){}
+  setInterval(pull,30000);
+ }
+}
+
+permText();render();tick();setInterval(tick,1000);
+</script>
+</body>
+</html>
