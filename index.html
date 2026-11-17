@@ -3,6 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0F6B66">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MediCare">
 <title>MediCare Web - Penjejak Kepatuhan Ubat</title>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -265,11 +272,13 @@ main{position:relative;z-index:1}
  <h1>MediCare Web</h1>
  <p>Ingatan Digital, Kesihatan Terjamin</p>
  <div class="top-actions">
+  <button class="btn-main" id="install" hidden>Pasang aplikasi</button>
   <button class="btn-main" id="enable">Aktifkan penggera &amp; notifikasi</button>
   <button class="btn-ghost" id="demo">Isi data contoh</button>
   <button class="btn-ghost" id="print">Cetak laporan PDF</button>
  </div>
  <p id="permInfo" style="font-size:.85rem;margin-top:.6rem"></p>
+ <p id="iosHint" hidden style="font-size:.85rem;margin-top:.4rem">Pada iPhone: tekan butang Kongsi, kemudian Tambah ke Skrin Utama.</p>
  <div class="nav"><button class="on" id="tabMain">Jadual &amp; pemantau</button><button id="tabInfo">Maklumat ubat</button><button id="tabBro">Brosur &amp; tips</button><button id="tabAsk">Tanya doktor (AI)</button><button id="tabQuiz">Kuiz</button></div>
 </div></header>
 
@@ -1233,6 +1242,14 @@ if(MON){
 }
 
 permText();render();tick();setInterval(tick,1000);
+
+/* ---------- Pasang sebagai aplikasi (PWA) ---------- */
+let deferredInstall=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;$('#install').hidden=false});
+$('#install').onclick=async()=>{if(!deferredInstall)return;deferredInstall.prompt();try{await deferredInstall.userChoice}catch(e){}deferredInstall=null;$('#install').hidden=true};
+window.addEventListener('appinstalled',()=>{$('#install').hidden=true});
+if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!navigator.standalone)$('#iosHint').hidden=false;
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>
